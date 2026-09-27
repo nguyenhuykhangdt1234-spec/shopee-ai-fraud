@@ -842,8 +842,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupStaffActionButtons(c) {
+    const actApprove = document.getElementById('act-approve');
+    const actMoreInfo = document.getElementById('act-more-info');
+    const actReject = document.getElementById('act-reject');
+    const actFreeze = document.getElementById('act-freeze');
+
     async function sendAudit(actName) {
-      const note = document.getElementById('staff-note')?.value || '';
+      const noteInput = document.getElementById('staff-note');
+      const note = noteInput?.value || '';
       try {
         if (window.location.protocol.startsWith('http')) {
           await fetch('/api/audit', {
@@ -855,33 +861,43 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         // Ignored in static mode
       }
+      // Cập nhật trạng thái hiển thị của đơn hàng
+      c.status = actName;
+      if (testCasesData[c.id]) {
+        testCasesData[c.id].status = actName;
+      }
+      renderDashboardQueue();
     }
 
     if (actApprove) {
-      actApprove.addEventListener('click', () => {
-        sendAudit('Phê duyệt hoàn tiền');
-        showToast('Đã Phê Duyệt Hoàn Tiền', `Đơn #${c.order.code} (${c.name}) được duyệt hoàn ${c.order.priceFormatted} về ShopeePay! Dữ liệu đã lưu vào Feedback Loop.`, 'success');
+      actApprove.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendAudit('Đã phê duyệt hoàn tiền');
+        showToast('Đã Phê Duyệt Hoàn Tiền', `Đơn #${c.order.code} (${c.name}) được duyệt hoàn ${c.order.priceFormatted} về ShopeePay! Dữ liệu đã lưu vào Feedback Loop & SQL Server.`, 'success');
       });
     }
 
     if (actMoreInfo) {
-      actMoreInfo.addEventListener('click', () => {
-        sendAudit('Yêu cầu bổ sung bằng chứng');
-        showToast('Yêu Cầu Bổ Sung Bằng Chứng', `Đã gửi thông báo yêu cầu cung cấp video mở hộp đến khách hàng #${c.custId}.`, 'warning');
+      actMoreInfo.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendAudit('Yêu cầu bổ sung video');
+        showToast('Yêu Cầu Bổ Sung Bằng Chứng', `Đã gửi thông báo yêu cầu cung cấp video mở hộp đến khách hàng #${c.custId}. Dữ liệu đã lưu vào SQL Server.`, 'warning');
       });
     }
 
     if (actReject) {
-      actReject.addEventListener('click', () => {
-        sendAudit('Yêu cầu trả hàng');
+      actReject.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendAudit('Yêu cầu gửi trả hàng');
         showToast('Yêu Cầu Trả Hàng', `Đã tạo mã vận đơn trả hàng SPX Express cho khách #${c.custId}. Cần nhận hàng trước khi hoàn tiền.`, 'info');
       });
     }
 
     if (actFreeze) {
-      actFreeze.addEventListener('click', () => {
-        sendAudit('Khóa gian lận');
-        showToast('Cảnh Báo Gian Lận', `Đã chặn khiếu nại #${c.order.code} và đưa thiết bị/IP vào danh sách giám sát Fraud Ring!`, 'danger', 5000);
+      actFreeze.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendAudit('Đã khóa gian lận (Fraud Ring)');
+        showToast('Cảnh Báo Gian Lận', `Đã chặn khiếu nại #${c.order.code} và đưa thiết bị/IP vào danh sách giám sát Fraud Ring trong SQL Server!`, 'danger', 5000);
       });
     }
   }
