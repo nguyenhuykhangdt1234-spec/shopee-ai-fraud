@@ -1,5 +1,5 @@
 // Shopee AI Fraud & Refund Management System
-// Implements the To-Be Business Process & Multi-tier AI Decision Engine
+// Implements the Business Process & Multi-tier AI Decision Engine
 
 document.addEventListener('DOMContentLoaded', () => {
   // ==================== DATA DEFINITIONS (5 TEST CASES) ====================
@@ -185,11 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
       riskLevel: "high",
       riskLabel: "RỦI RO CAO (Cold-Start)",
       aiRecommendation: "Chuyển Nhân viên CSKH kiểm tra chứng từ",
-      aiRecommendationDesc: "Theo Mục 7.2 (Đạo đức & Định kiến AI): Khách hàng mới chưa có dữ liệu lịch sử nhưng mua sản phẩm công nghệ đắt tiền (₫4.89M) và yêu cầu hoàn sau 15 phút. Chuyển người thật thẩm định để tránh tráo hàng.",
+      aiRecommendationDesc: "Khách hàng chưa có lịch sử mua hàng trước đây nhưng mua sản phẩm công nghệ giá trị cao (₫4.89M) và yêu cầu hoàn sau 15 phút. Chuyển chuyên viên thẩm định để kiểm tra thực tế.",
       features: {
         freq: "0 lần (Chưa có LS)",
         freqClass: "text-warning",
-        rate: "N/A (Tài khoản mới)",
+        rate: "0% (Đơn đầu tiên)",
         rateClass: "text-warning",
         anomaly: "Chưa có chuẩn so sánh",
         anomalyClass: "text-warning",
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addUserMessage("Chính sách trả hàng & hoàn tiền của Shopee như thế nào?");
         setTimeout(() => {
           addBotMessage(`
-            <strong>Chính Sách Hoàn Tiền Shopee (To-Be AI Policy):</strong><br>
+            <strong>Chính Sách Hoàn Tiền Shopee:</strong><br>
             1. <strong>Đơn Low Risk (<25%):</strong> Khách uy tín được hoàn tiền ngay lập tức không cần chờ shop gửi hàng.<br>
             2. <strong>Đơn Medium/High Risk:</strong> Được xử lý qua nhân viên kiểm tra bảo vệ cả quyền lợi của người mua lẫn người bán.<br>
             3. <strong>Cam kết:</strong> Miễn phí vận chuyển trả hàng 100% qua bưu cục Viettel Post / SPX Express.
