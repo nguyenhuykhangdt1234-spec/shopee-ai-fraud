@@ -255,15 +255,27 @@ app.post('/api/audit', async (req, res) => {
 
   if (isDbConnected && dbPool) {
     try {
-      // 1. Chèn vào bảng AuditLogs
+      // 1. Chèn vào bảng AuditLogs (kèm thông tin chi tiết đơn hàng, khách hàng, sản phẩm)
       await dbPool.request()
         .input('reqId', sql.Int, requestId)
         .input('staff', sql.NVarChar, staffName || 'Chuyên viên CSKH Shopee')
         .input('act', sql.NVarChar, action)
         .input('nt', sql.NVarChar, note || '')
         .query(`
-          INSERT INTO dbo.AuditLogs (RequestId, StaffName, StaffAction, StaffNote)
-          VALUES (@reqId, @staff, @act, @nt);
+          INSERT INTO dbo.AuditLogs (RequestId, OrderId, CustomerName, ProductName, RefundAmount, StaffName, StaffAction, StaffNote)
+          SELECT 
+            @reqId,
+            o.OrderId,
+            c.FullName,
+            o.ProductName,
+            o.PriceFormatted,
+            @staff,
+            @act,
+            @nt
+          FROM dbo.RefundRequests r
+          JOIN dbo.Orders o ON r.OrderId = o.OrderId
+          JOIN dbo.Customers c ON r.CustomerId = c.CustomerId
+          WHERE r.RequestId = @reqId;
         `);
 
       // 2. Cập nhật trạng thái trong bảng RefundRequests

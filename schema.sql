@@ -80,6 +80,10 @@ GO
 CREATE TABLE dbo.AuditLogs (
     LogId INT IDENTITY(1,1) PRIMARY KEY,
     RequestId INT NOT NULL,
+    OrderId VARCHAR(30) NULL,                -- Mã đơn hàng liên kết (ORD-...)
+    CustomerName NVARCHAR(100) NULL,         -- Tên khách hàng
+    ProductName NVARCHAR(255) NULL,          -- Sản phẩm khiếu nại
+    RefundAmount NVARCHAR(50) NULL,          -- Số tiền hoàn
     StaffName NVARCHAR(100) DEFAULT N'Chuyên viên CSKH Shopee',
     StaffAction NVARCHAR(100) NOT NULL,      -- Phê duyệt hoàn tiền, Yêu cầu bổ sung, Khóa fraud
     StaffNote NVARCHAR(MAX) NULL,            -- Ghi chú thẩm định của chuyên viên
