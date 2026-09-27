@@ -26,8 +26,9 @@ app.use(express.static(path.join(__dirname)));
 // ============================================================================
 const dbConfig = {
   user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || 'your_password_here',
-  server: process.env.DB_SERVER || 'localhost\\MSSQLSERVER01', // Hoặc localhost
+  password: process.env.DB_PASSWORD || 'Pasword1234Ki',
+  server: process.env.DB_SERVER || '127.0.0.1',
+  port: parseInt(process.env.DB_PORT || '1433', 10),
   database: process.env.DB_DATABASE || 'ShopeeFraudShieldDB',
   options: {
     encrypt: false, // Set false nếu chạy localhost
