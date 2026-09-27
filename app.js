@@ -842,31 +842,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupStaffActionButtons(c) {
-    const actApprove = document.getElementById('act-approve');
-    const actMoreInfo = document.getElementById('act-more-info');
-    const actReject = document.getElementById('act-reject');
-    const actFreeze = document.getElementById('act-freeze');
+    async function sendAudit(actName) {
+      const note = document.getElementById('staff-note')?.value || '';
+      try {
+        if (window.location.protocol.startsWith('http')) {
+          await fetch('/api/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId: c.id, action: actName, note })
+          });
+        }
+      } catch (err) {
+        // Ignored in static mode
+      }
+    }
 
     if (actApprove) {
       actApprove.addEventListener('click', () => {
+        sendAudit('Phê duyệt hoàn tiền');
         showToast('Đã Phê Duyệt Hoàn Tiền', `Đơn #${c.order.code} (${c.name}) được duyệt hoàn ${c.order.priceFormatted} về ShopeePay! Dữ liệu đã lưu vào Feedback Loop.`, 'success');
       });
     }
 
     if (actMoreInfo) {
       actMoreInfo.addEventListener('click', () => {
+        sendAudit('Yêu cầu bổ sung bằng chứng');
         showToast('Yêu Cầu Bổ Sung Bằng Chứng', `Đã gửi thông báo yêu cầu cung cấp video mở hộp đến khách hàng #${c.custId}.`, 'warning');
       });
     }
 
     if (actReject) {
       actReject.addEventListener('click', () => {
+        sendAudit('Yêu cầu trả hàng');
         showToast('Yêu Cầu Trả Hàng', `Đã tạo mã vận đơn trả hàng SPX Express cho khách #${c.custId}. Cần nhận hàng trước khi hoàn tiền.`, 'info');
       });
     }
 
     if (actFreeze) {
       actFreeze.addEventListener('click', () => {
+        sendAudit('Khóa gian lận');
         showToast('Cảnh Báo Gian Lận', `Đã chặn khiếu nại #${c.order.code} và đưa thiết bị/IP vào danh sách giám sát Fraud Ring!`, 'danger', 5000);
       });
     }
@@ -972,5 +986,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==================== INITIALIZE APP ====================
-  loadTestCase(1);
+  async function initApp() {
+    try {
+      if (window.location.protocol.startsWith('http')) {
+        const resp = await fetch('/api/cases');
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json && json.data && Object.keys(json.data).length > 0) {
+            Object.assign(testCasesData, json.data);
+            console.log('⚡ Đang nạp dữ liệu từ Backend:', json.source);
+          }
+        }
+      }
+    } catch (e) {
+      // Static fallback
+    }
+    loadTestCase(1);
+  }
+
+  initApp();
 });
