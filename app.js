@@ -653,37 +653,86 @@ document.addEventListener('DOMContentLoaded', () => {
     initChatConversation();
   });
 
+  // ==================== TOAST NOTIFICATION SYSTEM ====================
+  function showToast(title, message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const icons = {
+      success: '✅',
+      warning: '⚠️',
+      danger: '🚨',
+      info: '🛒'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || '🔔'}</div>
+      <div class="toast-body">
+        <div class="toast-title">${title}</div>
+        <div class="toast-text">${message}</div>
+      </div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('hide');
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, duration);
+  }
+
   // ==================== DASHBOARD TABLE & ACTIONS ====================
   let currentDashboardFilter = 'all';
+  let currentSearchQuery = '';
+
+  const searchInput = document.getElementById('queue-search-input');
+  const clearSearchBtn = document.getElementById('clear-search-btn');
+  const exportCsvBtn = document.getElementById('export-csv-btn');
 
   function renderDashboardQueue(filter = currentDashboardFilter) {
     currentDashboardFilter = filter;
     queueTableBody.innerHTML = '';
 
     const allCases = Object.values(testCasesData);
+    const query = currentSearchQuery.trim().toLowerCase();
+
     const filteredCases = allCases.filter(item => {
-      if (currentDashboardFilter === 'all') return true;
-      return item.riskLevel === currentDashboardFilter;
+      const matchFilter = (currentDashboardFilter === 'all' || item.riskLevel === currentDashboardFilter);
+      if (!query) return matchFilter;
+      const matchSearch = item.name.toLowerCase().includes(query) ||
+                          item.order.code.toLowerCase().includes(query) ||
+                          item.order.product.toLowerCase().includes(query) ||
+                          item.custId.toLowerCase().includes(query) ||
+                          item.riskLabel.toLowerCase().includes(query);
+      return matchFilter && matchSearch;
     });
 
-    // Cập nhật dòng chữ hiển thị trạng thái lọc
+    // Cập nhật dòng chữ hiển thị trạng thái lọc & tìm kiếm
     const filterStatusEl = document.getElementById('filter-status-indicator');
     if (filterStatusEl) {
-      const labels = {
-        'all': 'Đang hiển thị: Tất cả 5 đơn',
-        'low': 'Đang lọc: Rủi ro Thấp (1 đơn)',
-        'medium': 'Đang lọc: Rủi ro Trung bình (1 đơn)',
-        'high': 'Đang lọc: Rủi ro Cao (2 đơn)',
-        'critical': 'Đang lọc: Fraud Ring (1 đơn)'
-      };
-      filterStatusEl.innerText = labels[currentDashboardFilter] || 'Đang hiển thị: Tất cả 5 đơn';
+      if (query) {
+        filterStatusEl.innerText = `Tìm kiếm "${query}": Tìm thấy ${filteredCases.length} / ${allCases.length} đơn`;
+      } else {
+        const labels = {
+          'all': 'Đang hiển thị: Tất cả 5 đơn',
+          'low': 'Đang lọc: Rủi ro Thấp (1 đơn)',
+          'medium': 'Đang lọc: Rủi ro Trung bình (1 đơn)',
+          'high': 'Đang lọc: Rủi ro Cao (2 đơn)',
+          'critical': 'Đang lọc: Fraud Ring (1 đơn)'
+        };
+        filterStatusEl.innerText = labels[currentDashboardFilter] || `Đang hiển thị: ${filteredCases.length} đơn`;
+      }
     }
 
     if (filteredCases.length === 0) {
       queueTableBody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px;">
-            🔍 Không có yêu cầu nào thuộc nhóm lọc này.
+          <td colspan="6" style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 13px;">
+            🔍 Không tìm thấy đơn hàng nào phù hợp với điều kiện lọc & tìm kiếm.
           </td>
         </tr>
       `;
@@ -798,13 +847,108 @@ document.addEventListener('DOMContentLoaded', () => {
     const actReject = document.getElementById('act-reject');
     const actFreeze = document.getElementById('act-freeze');
 
-    [actApprove, actMoreInfo, actReject, actFreeze].forEach(btn => {
-      if (!btn) return;
-      btn.addEventListener('click', () => {
-        const actionName = btn.innerText;
-        alert(`[Shopee Audit Log]\n\nĐã ghi nhận quyết định của Chuyên viên: "${actionName}" cho hồ sơ #${c.order.code}.\n\nQuyết định này đã được lưu vào hệ thống Continuous Learning (Mục 4.4) để tinh chỉnh trọng số AI.`);
+    if (actApprove) {
+      actApprove.addEventListener('click', () => {
+        showToast('Đã Phê Duyệt Hoàn Tiền', `Đơn #${c.order.code} (${c.name}) được duyệt hoàn ${c.order.priceFormatted} về ShopeePay! Dữ liệu đã lưu vào Feedback Loop.`, 'success');
       });
+    }
+
+    if (actMoreInfo) {
+      actMoreInfo.addEventListener('click', () => {
+        showToast('Yêu Cầu Bổ Sung Bằng Chứng', `Đã gửi thông báo yêu cầu cung cấp video mở hộp đến khách hàng #${c.custId}.`, 'warning');
+      });
+    }
+
+    if (actReject) {
+      actReject.addEventListener('click', () => {
+        showToast('Yêu Cầu Trả Hàng', `Đã tạo mã vận đơn trả hàng SPX Express cho khách #${c.custId}. Cần nhận hàng trước khi hoàn tiền.`, 'info');
+      });
+    }
+
+    if (actFreeze) {
+      actFreeze.addEventListener('click', () => {
+        showToast('Cảnh Báo Gian Lận', `Đã chặn khiếu nại #${c.order.code} và đưa thiết bị/IP vào danh sách giám sát Fraud Ring!`, 'danger', 5000);
+      });
+    }
+  }
+
+  // ==================== CSV EXPORT FUNCTION ====================
+  function exportQueueToCSV() {
+    const allCases = Object.values(testCasesData);
+    const query = currentSearchQuery.trim().toLowerCase();
+    const visibleCases = allCases.filter(item => {
+      const matchFilter = (currentDashboardFilter === 'all' || item.riskLevel === currentDashboardFilter);
+      if (!query) return matchFilter;
+      const matchSearch = item.name.toLowerCase().includes(query) ||
+                          item.order.code.toLowerCase().includes(query) ||
+                          item.order.product.toLowerCase().includes(query) ||
+                          item.custId.toLowerCase().includes(query) ||
+                          item.riskLabel.toLowerCase().includes(query);
+      return matchFilter && matchSearch;
     });
+
+    if (visibleCases.length === 0) {
+      showToast('Thông Báo', 'Không có dữ liệu đơn hàng nào để xuất file!', 'warning');
+      return;
+    }
+
+    // UTF-8 BOM (\uFEFF) giúp mở trực tiếp bằng Excel tiếng Việt không bị lỗi font ký tự
+    let csvContent = '\uFEFF';
+    csvContent += 'Mã Hồ Sơ,Mã Khách Hàng,Tên Khách Hàng,Hạng Khách,Sản Phẩm,Giá Trị Đơn,Điểm Rủi Ro (%),Phân Loại AI,Đề Xuất Xử Lý,Lý Do Khiếu Nại\n';
+
+    visibleCases.forEach(c => {
+      const row = [
+        `"${c.order.code}"`,
+        `"${c.custId}"`,
+        `"${c.name}"`,
+        `"${c.tier}"`,
+        `"${c.order.product.replace(/"/g, '""')}"`,
+        `"${c.order.priceFormatted}"`,
+        `"${c.riskScore}%"`,
+        `"${c.riskLabel}"`,
+        `"${c.aiRecommendation.replace(/"/g, '""')}"`,
+        `"${c.reason.replace(/"/g, '""')}"`
+      ];
+      csvContent += row.join(',') + '\n';
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 10);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Shopee_AI_Fraud_Report_${timestamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('Xuất Báo Cáo Thành Công', `Đã xuất ${visibleCases.length} hồ sơ thẩm định ra file Shopee_AI_Fraud_Report_${timestamp}.csv!`, 'success');
+  }
+
+  // Live Search Listeners
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value;
+      if (clearSearchBtn) {
+        clearSearchBtn.style.display = currentSearchQuery ? 'block' : 'none';
+      }
+      renderDashboardQueue();
+    });
+  }
+
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      currentSearchQuery = '';
+      clearSearchBtn.style.display = 'none';
+      renderDashboardQueue();
+      searchInput.focus();
+    });
+  }
+
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', exportQueueToCSV);
   }
 
   // Filter Pills in Dashboard

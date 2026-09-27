@@ -368,6 +368,20 @@
                 <h3>Danh Sách Đơn Cần Thẩm Định (Human-in-the-Loop)</h3>
                 <p id="filter-status-indicator">Đang hiển thị: Tất cả 5 đơn</p>
               </div>
+              <div class="panel-header-controls">
+                <div class="search-box">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="queue-search-input" placeholder="Tìm theo mã đơn, khách hàng, sản phẩm..." autocomplete="off">
+                  <button type="button" id="clear-search-btn" class="clear-search-btn" title="Xóa tìm kiếm" style="display:none;">✕</button>
+                </div>
+                <button type="button" id="export-csv-btn" class="export-btn" title="Xuất báo cáo dữ liệu thẩm định ra file CSV / Excel">
+                  <span class="btn-icon">📥</span> Xuất CSV
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-pills-row">
+              <span class="filter-label">Lọc rủi ro:</span>
               <div class="filter-pills">
                 <button type="button" class="filter-pill active" data-filter="all">Tất cả (5)</button>
                 <button type="button" class="filter-pill" data-filter="low">Rủi ro Thấp (1)</button>
@@ -413,6 +427,9 @@
 
   </main>
 
-  <script src="app.js?v=20260927_1527"></script>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js?v=20260927_1650"></script>
 </body>
 </html>
