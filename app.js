@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 1,
       name: "Nguyễn Thảo My",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-      tier: "⭐ Shopee Kim Cương",
+      tier: "",
       custId: "CUST-98241",
       totalOrders: 45,
       refundedOrders: 1,
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 2,
       name: "Lê Minh Khang",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-      tier: "🥈 Shopee Bạc",
+      tier: "",
       custId: "CUST-41029",
       totalOrders: 12,
       refundedOrders: 2,
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 3,
       name: "Trần Hoàng Nam",
       avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
-      tier: "🥉 Shopee Đồng",
+      tier: "",
       custId: "CUST-19284",
       totalOrders: 11,
       refundedOrders: 6,
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
       riskScore: 74,
       riskLevel: "high",
       riskLabel: "RỦI RO CAO (60 - 84%)",
-      aiRecommendation: "Chuyển Nhân viên CSKH Thẩm định (Escalate)",
+      aiRecommendation: "Chuyển Nhân viên CSKH Thẩm định",
       aiRecommendationDesc: "Tài khoản có tỷ lệ hoàn tiền vượt ngưỡng 50% trong 30 ngày qua (4 lần hoàn). Giá trị đơn hàng gấp 12 lần giá trị trung bình lịch sử. Ảnh có dấu hiệu mờ, nghi vấn sử dụng ảnh mạng.",
       features: {
         freq: "4 lần (Vượt ngưỡng)",
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 4,
       name: "Vũ Quốc Bảo (Nghi vấn Fraud Ring)",
       avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80",
-      tier: "⚠️ Tài khoản mới nghi vấn",
+      tier: "",
       custId: "CUST-77491",
       totalOrders: 3,
       refundedOrders: 3,
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 5,
       name: "Đỗ Hải Đăng (Khách mới - Cold Start)",
       avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
-      tier: "🆕 Khách hàng mới (3 ngày)",
+      tier: "",
       custId: "CUST-00412",
       totalOrders: 1,
       refundedOrders: 0,
@@ -287,8 +287,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Update User Profile Sidebar
     userAvatarEl.src = currentCase.avatar;
     userNameEl.innerText = currentCase.name;
-    userTierEl.innerText = currentCase.tier;
-    userIdEl.innerText = `ID: #${currentCase.custId}`;
+    if (userTierEl) userTierEl.style.display = 'none';
+    userIdEl.innerText = `Mã KH: #${currentCase.custId}`;
 
     statTotalOrders.innerText = `${currentCase.totalOrders} đơn`;
     statRefundedOrders.innerText = `${currentCase.refundedOrders} đơn`;
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.innerHTML = `
         <td class="cell-cust">
           <strong>${item.name}</strong>
-          <small>#${item.custId} • ${item.tier}</small>
+          <small>Mã KH: #${item.custId}</small>
         </td>
         <td>
           <div style="font-weight: 600; font-size: 12px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -794,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="audit-section">
         <h4>1. Thông Tin Đơn Hàng & Khách Hàng</h4>
         <div style="font-size: 12px; line-height: 1.6;">
-          <strong>Khách hàng:</strong> ${c.name} (Hạng: ${c.tier})<br>
+          <strong>Khách hàng:</strong> ${c.name} (Mã KH: #${c.custId})<br>
           <strong>Sản phẩm:</strong> ${c.order.product}<br>
           <strong>Giá trị đơn:</strong> <span style="color: var(--shopee-orange); font-weight: 700;">${c.order.priceFormatted}</span><br>
           <strong>Lý do khiếu nại:</strong> <em>"${c.reason}"</em>
@@ -821,9 +821,9 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
 
       <div class="audit-section">
-        <h4>4. Thao Tác Của Nhân Viên CSKH (Human-in-the-Loop)</h4>
+        <h4>4. Thao Tác Của Nhân Viên CSKH</h4>
         <p style="font-size: 11.5px; color: #64748b; margin-bottom: 8px;">
-          Theo Mục 4.3 trong đề tài: Nhân viên có quyền xem xét, chấp thuận hoặc điều chỉnh hướng xử lý. Mọi quyết định sẽ được lưu vào hệ thống Continuous Learning.
+          Nhân viên có quyền xem xét, chấp thuận hoặc điều chỉnh hướng xử lý theo đúng thẩm quyền. Mọi quyết định sẽ được lưu vào hệ thống Continuous Learning.
         </p>
 
         <textarea id="staff-note" placeholder="Nhập ghi chú thẩm định hoặc lý do điều chỉnh..." style="width: 100%; height: 60px; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; font-family: inherit; margin-bottom: 8px;"></textarea>
@@ -924,14 +924,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // UTF-8 BOM (\uFEFF) giúp mở trực tiếp bằng Excel tiếng Việt không bị lỗi font ký tự
     let csvContent = '\uFEFF';
-    csvContent += 'Mã Hồ Sơ,Mã Khách Hàng,Tên Khách Hàng,Hạng Khách,Sản Phẩm,Giá Trị Đơn,Điểm Rủi Ro (%),Phân Loại AI,Đề Xuất Xử Lý,Lý Do Khiếu Nại\n';
+    csvContent += 'Mã Hồ Sơ,Mã Khách Hàng,Tên Khách Hàng,Sản Phẩm,Giá Trị Đơn,Điểm Rủi Ro (%),Phân Loại AI,Đề Xuất Xử Lý,Lý Do Khiếu Nại\n';
 
     visibleCases.forEach(c => {
       const row = [
         `"${c.order.code}"`,
         `"${c.custId}"`,
         `"${c.name}"`,
-        `"${c.tier}"`,
         `"${c.order.product.replace(/"/g, '""')}"`,
         `"${c.order.priceFormatted}"`,
         `"${c.riskScore}%"`,
