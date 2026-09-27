@@ -1,0 +1,6 @@
+{
+  "name": "shopee-ai-fraud",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
