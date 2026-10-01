@@ -695,26 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .trim();
   }
 
-  // Kết nối API Key button
-  const apiKeyBtn = document.getElementById('api-key-btn');
-  if (apiKeyBtn) {
-    apiKeyBtn.addEventListener('click', () => {
-      const currentKey = localStorage.getItem('gemini_api_key') || '';
-      const input = prompt(
-        "Nhập Google Gemini API Key của bạn để trò chuyện trực tiếp với LLM (hỏi gì đáp nấy 100%):\n\n(Lấy key MIỄN PHÍ tại: aistudio.google.com)\nĐể trống nếu muốn xóa key và dùng AI tích hợp sẵn:",
-        currentKey
-      );
-      if (input !== null) {
-        if (input.trim()) {
-          localStorage.setItem('gemini_api_key', input.trim());
-          showToast('✨ Đã Kết Nối Gemini AI', 'Chatbot đã kích hoạt mô hình Google Gemini 2.5 Flash!', 'success');
-        } else {
-          localStorage.removeItem('gemini_api_key');
-          showToast('ℹ️ Chế Độ AI Nội Bộ', 'Đã chuyển về mô hình ngôn ngữ nội bộ Shopee AI.', 'info');
-        }
-      }
-    });
-  }
+  
 
   // Bộ Xử Lý Ngôn Ngữ Tự Nhiên Toàn Diện (Comprehensive Smart Semantic NLP Engine)
   // Xử lý thông minh khi chưa gắn API Key: hiểu ngữ nghĩa đa ngành, hỏi gì đáp nấy, không bị giới hạn kịch bản!
