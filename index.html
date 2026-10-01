@@ -26,7 +26,6 @@
         <div class="system-title-badge">
           <span class="pulse-dot"></span>
           <span class="title-main">Shopee AI Fraud Shield</span>
-          <span class="title-sub">Smart Detection</span>
         </div>
       </div>
 
@@ -37,7 +36,7 @@
         </button>
         <button id="tab-dashboard-btn" class="nav-btn" data-target="dashboard-screen">
           <span class="icon">🛡️</span> Quản Trị Viên & CSKH
-          <span id="admin-lock-badge" class="nav-lock-badge" title="Khu vực dành riêng cho Quản Trị Viên (Mật khẩu: Pasword1234Ki)">🔒</span>
+          <span id="admin-lock-badge" class="nav-lock-badge" title="Khu vực dành riêng cho Quản Trị Viên">🔒</span>
           <span id="queue-badge" class="nav-badge">3</span>
         </button>
       </nav>
@@ -438,7 +437,7 @@
 
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="app.js?v=1790834337129"></script>
+  <script src="app.js?v=1790835065146"></script>
 
   <!-- ==================== LOGIN / ROLE SWITCH MODAL ==================== -->
   <div id="login-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
@@ -513,9 +512,6 @@
             <input type="password" id="admin-password" class="form-control" placeholder="Nhập mật khẩu quản trị viên" autocomplete="current-password">
             <button type="button" id="toggle-admin-pass-btn" class="toggle-pass-btn" title="Hiện/ẩn mật khẩu">👁️</button>
           </div>
-          <div class="password-hint-box">
-            <span>💡 Mật khẩu quản trị viên là: <code>Pasword1234Ki</code></span>
-          </div>
           <div id="admin-login-error" class="login-error-msg hidden"></div>
         </div>
 
@@ -523,15 +519,8 @@
           <button type="submit" id="btn-submit-admin" class="btn-login-submit admin">
             🔐 Đăng Nhập Quản Trị Viên
           </button>
-          <button type="button" id="btn-quick-admin-login" class="btn-quick-admin">
-            ⚡ Đăng nhập nhanh Quản trị viên (1-Click)
-          </button>
         </div>
       </form>
-      
-      <div class="modal-footer-note">
-        <span>🛡️ Hệ thống bảo mật phân quyền RBAC đa cấp độ Shopee AI Fraud Shield</span>
-      </div>
     </div>
   </div>
 

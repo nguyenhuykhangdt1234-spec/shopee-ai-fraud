@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('🛡️ Đăng Nhập Quản Trị Viên Thành Công', 'Đã xác thực quyền Admin! Bạn có toàn quyền duyệt đơn & thẩm định.', 'success');
     } else {
       if (adminLoginError) {
-        adminLoginError.innerText = '❌ Mật khẩu quản trị viên không chính xác! Vui lòng nhập: Pasword1234Ki';
+        adminLoginError.innerText = '❌ Mật khẩu quản trị viên không chính xác! Vui lòng thử lại.';
         adminLoginError.classList.remove('hidden');
       }
       adminPasswordInput?.focus();
@@ -424,13 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (btnQuickAdminLogin) {
-    btnQuickAdminLogin.addEventListener('click', () => {
-      if (adminPasswordInput) adminPasswordInput.value = 'Pasword1234Ki';
-      loginAsAdmin('Pasword1234Ki');
-    });
-  }
-
   if (toggleAdminPassBtn) {
     toggleAdminPassBtn.addEventListener('click', () => {
       if (adminPasswordInput.type === 'password') {
@@ -442,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
 
   // ==================== NAVIGATION TABS WITH RBAC ====================
   tabButtons.forEach(btn => {
