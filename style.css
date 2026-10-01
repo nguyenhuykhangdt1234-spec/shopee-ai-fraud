@@ -2643,3 +2643,103 @@ body {
 .order-random-status-bar, .btn-re-random { display: none !important; }
 
 .order-random-status-bar, .btn-re-random { display: none !important; }
+
+
+/* ==================== FORMAL ENTERPRISE UI ICONS ==================== */
+.ui-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.ui-icon-xs { width: 12px; height: 12px; }
+.ui-icon-sm { width: 14px; height: 14px; }
+.ui-icon-md { width: 16px; height: 16px; }
+.ui-icon-lg { width: 20px; height: 20px; }
+.ui-icon-xl { width: 28px; height: 28px; }
+
+.m-icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: #f1f5f9;
+  color: var(--text-secondary);
+}
+
+.highlight-green .m-icon {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.highlight-amber .m-icon {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.highlight-red .m-icon {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.role-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.role-tab.active .role-icon {
+  background: var(--shopee-orange-light);
+  color: var(--shopee-orange);
+}
+
+.nav-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+}
+
+.order-status-badge {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.order-status-badge .ui-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.banner-icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-icon .ui-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.staff-actions-grid button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

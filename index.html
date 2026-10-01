@@ -32,25 +32,25 @@
       <!-- Navigation Tabs -->
       <nav class="nav-tabs">
         <button id="tab-chat-btn" class="nav-btn active" data-target="chat-screen">
-          <span class="icon">💬</span> Khách Hàng (Chatbot)
+          <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Khách Hàng (CSKH)
         </button>
         <button id="tab-dashboard-btn" class="nav-btn" data-target="dashboard-screen">
-          <span class="icon">🛡️</span> Quản Trị Viên & CSKH
-          <span id="admin-lock-badge" class="nav-lock-badge" title="Khu vực dành riêng cho Quản Trị Viên">🔒</span>
+          <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Quản Trị Viên & CSKH
+          <span id="admin-lock-badge" class="nav-lock-badge" title="Khu vực dành riêng cho Quản Trị Viên"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           <span id="queue-badge" class="nav-badge">3</span>
         </button>
       </nav>
       <!-- User Authentication & Role Indicator -->
       <div class="user-auth-widget">
         <div id="auth-status-chip" class="auth-status-chip customer" title="Bấm để chuyển đổi vai trò Khách Hàng / Quản Trị Viên">
-          <span class="auth-role-avatar" id="auth-role-avatar">👤</span>
+          <span class="auth-role-avatar" id="auth-role-avatar"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
           <div class="auth-role-info">
             <span class="auth-user-title" id="auth-user-title">Nguyễn Thảo My</span>
             <span class="auth-role-tag" id="auth-role-tag">Khách Hàng</span>
           </div>
         </div>
         <button type="button" id="open-login-btn" class="btn-auth-switch" title="Chuyển đổi vai trò Khách Hàng hoặc Quản Trị Viên">
-          <span class="switch-icon">🔄</span> Đổi vai trò
+          <span class="switch-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span> Đổi vai trò
         </button>
       </div>
     </div>
@@ -78,7 +78,7 @@
 
           <div class="sidebar-block">
             <div class="block-title">
-              <span>📦 Đơn Hàng Đủ Điều Kiện Trả Hàng</span>
+              <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg> Đơn Hàng Đủ Điều Kiện Trả Hàng</span>
               <span class="badge-count" id="eligible-orders-count">3 đơn</span>
             </div>
             <div class="orders-list" id="sidebar-orders-list">
@@ -87,7 +87,7 @@
           </div>
 
           <div class="sidebar-block stats-summary">
-            <div class="block-title">📊 Lịch Sử Hoàn Tiền Tài Khoản</div>
+            <div class="block-title"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Lịch Sử Hoàn Tiền Tài Khoản</div>
             <div class="stat-grid">
               <div class="stat-item">
                 <span class="stat-label">Tổng đơn đã mua</span>
@@ -122,14 +122,14 @@
               <div class="bot-meta">
                 <div class="bot-name-row">
                   <h4>Shopee Assistant AI</h4>
-                  <span class="verified-tag">✓ Hỗ trợ Hoàn tiền 24/7</span>
+                  <span class="verified-tag"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Hỗ trợ Hoàn tiền 24/7</span>
                 </div>
                 <p class="bot-status">Sẵn sàng hỗ trợ phân tích và giải quyết yêu cầu hoàn tiền ngay lập tức</p>
               </div>
             </div>
             <div class="chat-actions">
               <button id="reset-chat-btn" class="btn-text" title="Làm mới cuộc trò chuyện">
-                🔄 Bắt đầu lại
+                <svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Bắt đầu lại
               </button>
             </div>
           </div>
@@ -143,7 +143,7 @@
           <div id="ai-process-bar" class="ai-process-bar hidden">
             <div class="pipeline-header">
               <div class="pipeline-title">
-                <span class="ai-sparkle">✨</span>
+                <span class="ai-sparkle"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></span>
                 <strong>Mô Hình AI Đang Phân Tích Yêu Cầu Hoàn Tiền</strong>
               </div>
               <span id="ai-step-timer" class="pipeline-timer">Thời gian xử lý: 0.8s</span>
@@ -174,9 +174,9 @@
           <!-- Input Bar -->
           <div class="chat-input-area">
             <div class="quick-chips" id="quick-chips">
-              <button class="chip-btn" data-action="start_refund">📦 Yêu cầu Trả hàng / Hoàn tiền</button>
-              <button class="chip-btn" data-action="check_status">🔍 Kiểm tra tiến độ hoàn tiền</button>
-              <button class="chip-btn" data-action="policy_faq">❓ Chính sách hoàn tiền Shopee</button>
+              <button class="chip-btn" data-action="start_refund"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg> Yêu cầu Trả hàng / Hoàn tiền</button>
+              <button class="chip-btn" data-action="check_status"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Kiểm tra tiến độ hoàn tiền</button>
+              <button class="chip-btn" data-action="policy_faq"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Chính sách hoàn tiền Shopee</button>
             </div>
             <form id="chat-form" class="input-form">
               <input type="text" id="chat-input" placeholder="Nhập tin nhắn hoặc chọn đơn hàng phía trên..." autocomplete="off">
@@ -277,7 +277,7 @@
         <!-- Summary Stats Header -->
         <div class="dash-metrics-bar">
           <div class="metric-card">
-            <span class="m-icon">📥</span>
+            <span class="m-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>
             <div class="m-info">
               <span class="m-label">Yêu cầu hoàn tiền hôm nay</span>
               <strong class="m-val">1,248 đơn</strong>
@@ -286,7 +286,7 @@
           </div>
 
           <div class="metric-card highlight-green">
-            <span class="m-icon">⚡</span>
+            <span class="m-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
             <div class="m-info">
               <span class="m-label">Tự động duyệt bởi AI (Low Risk)</span>
               <strong class="m-val">912 đơn (73.1%)</strong>
@@ -295,7 +295,7 @@
           </div>
 
           <div class="metric-card highlight-amber">
-            <span class="m-icon">⚠️</span>
+            <span class="m-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
             <div class="m-info">
               <span class="m-label">Cần kiểm tra (Med/High Risk)</span>
               <strong class="m-val">284 đơn (22.7%)</strong>
@@ -304,7 +304,7 @@
           </div>
 
           <div class="metric-card highlight-red">
-            <span class="m-icon">🚨</span>
+            <span class="m-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
             <div class="m-info">
               <span class="m-label">Chặn gian lận / Fraud Ring</span>
               <strong class="m-val">52 đơn (4.2%)</strong>
@@ -325,12 +325,12 @@
               </div>
               <div class="panel-header-controls">
                 <div class="search-box">
-                  <span class="search-icon">🔍</span>
+                  <span class="search-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
                   <input type="text" id="queue-search-input" placeholder="Tìm theo mã đơn, khách hàng, sản phẩm..." autocomplete="off">
-                  <button type="button" id="clear-search-btn" class="clear-search-btn" title="Xóa tìm kiếm" style="display:none;">✕</button>
+                  <button type="button" id="clear-search-btn" class="clear-search-btn" title="Xóa tìm kiếm" style="display:none;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                 </div>
                 <button type="button" id="export-csv-btn" class="export-btn" title="Xuất báo cáo dữ liệu thẩm định ra file CSV / Excel">
-                  <span class="btn-icon">📥</span> Xuất CSV
+                  <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Xuất CSV
                 </button>
               </div>
             </div>
@@ -391,7 +391,7 @@
 
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="app.js?v=1790836133292"></script>
+  <script src="app.js?v=1790836558700"></script>
 
   <!-- ==================== LOGIN / ROLE SWITCH MODAL ==================== -->
   <div id="login-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
@@ -413,14 +413,14 @@
       <!-- Role Switcher Tabs inside Modal -->
       <div class="login-role-tabs">
         <button type="button" id="modal-tab-customer" class="role-tab active" data-role="customer">
-          <span class="role-icon">👤</span>
+          <span class="role-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
           <div class="role-tab-text">
             <strong>Khách Hàng</strong>
             <small>Chatbot & Khiếu nại</small>
           </div>
         </button>
         <button type="button" id="modal-tab-admin" class="role-tab" data-role="admin">
-          <span class="role-icon">🛡️</span>
+          <span class="role-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
           <div class="role-tab-text">
             <strong>Quản Trị Viên</strong>
             <small>Dashboard & Duyệt đơn</small>
@@ -448,7 +448,7 @@
 
         <div class="form-actions">
           <button type="submit" id="btn-submit-customer" class="btn-login-submit customer">
-            🛍️ Đăng Nhập Vai Khách Hàng
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Đăng Nhập Khách Hàng
           </button>
         </div>
       </form>
@@ -464,14 +464,14 @@
           <label for="admin-password">Mật khẩu Quản Trị Viên: <span class="required">*</span></label>
           <div class="password-input-wrap">
             <input type="password" id="admin-password" class="form-control" placeholder="Nhập mật khẩu quản trị viên" autocomplete="current-password">
-            <button type="button" id="toggle-admin-pass-btn" class="toggle-pass-btn" title="Hiện/ẩn mật khẩu">👁️</button>
+            <button type="button" id="toggle-admin-pass-btn" class="toggle-pass-btn" title="Hiện/ẩn mật khẩu"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <div id="admin-login-error" class="login-error-msg hidden"></div>
         </div>
 
         <div class="form-actions-admin">
           <button type="submit" id="btn-submit-admin" class="btn-login-submit admin">
-            🔐 Đăng Nhập Quản Trị Viên
+            <svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Đăng Nhập Quản Trị Viên
           </button>
         </div>
       </form>

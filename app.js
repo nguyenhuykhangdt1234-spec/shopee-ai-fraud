@@ -2,6 +2,39 @@
 // Implements the Business Process & Multi-tier AI Decision Engine
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Formal Enterprise SVG Icon Helper
+  const SVG_ICONS = {
+    'chat': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'shield': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    'shield-check': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>',
+    'shield-alert': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    'lock': '<svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    'user': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    'refresh': '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+    'package': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>',
+    'truck': '<svg class="ui-icon" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    'check-circle': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    'alert-triangle': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'inbox': '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+    'zap': '<svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    'search': '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    'download': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    'eye': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    'eye-off': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
+    'help-circle': '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'check': '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+    'log-in': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
+    'sparkles': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>',
+    'upload': '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+  };
+
+  function getSvgIcon(name, extraClass = '') {
+    const raw = SVG_ICONS[name] || '';
+    if (!extraClass) return raw;
+    return raw.replace('class="ui-icon"', 'class="ui-icon ' + extraClass + '"');
+  }
+
   // ==================== DATA DEFINITIONS (5 TEST CASES) ====================
   const testCasesData = {
     1: {
@@ -288,13 +321,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!authStatusChip) return;
     if (currentAuthRole === 'admin') {
       authStatusChip.className = 'auth-status-chip admin';
-      if (authRoleAvatar) authRoleAvatar.innerText = '🛡️';
+      if (authRoleAvatar) authRoleAvatar.innerHTML = getSvgIcon('shield');
       if (authUserTitle) authUserTitle.innerText = 'Chuyên Viên CSKH';
       if (authRoleTag) authRoleTag.innerText = 'Quản Trị Viên';
       if (adminLockBadge) adminLockBadge.style.display = 'none';
     } else {
       authStatusChip.className = 'auth-status-chip customer';
-      if (authRoleAvatar) authRoleAvatar.innerText = '👤';
+      if (authRoleAvatar) authRoleAvatar.innerHTML = getSvgIcon('user');
       if (authUserTitle) authUserTitle.innerText = currentCase?.name || currentAuthName || 'Nguyễn Thảo My';
       if (authRoleTag) authRoleTag.innerText = 'Khách Hàng';
       if (adminLockBadge) adminLockBadge.style.display = 'inline-flex';
@@ -347,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Switch to customer chat screen
     const chatBtn = document.getElementById('tab-chat-btn');
     if (chatBtn) chatBtn.click();
-    showToast('🛍️ Đăng Nhập Thành Công', `Đã đăng nhập vai Khách Hàng: ${currentCase.name}`, 'success');
+    showToast('Đăng Nhập Thành Công', `Đã đăng nhập vai Khách Hàng: ${currentCase.name}`, 'success');
   }
 
   function loginAsAdmin(password) {
@@ -371,10 +404,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetScreen) targetScreen.classList.add('active');
       }
 
-      showToast('🛡️ Đăng Nhập Quản Trị Viên Thành Công', 'Đã xác thực quyền Admin! Bạn có toàn quyền duyệt đơn & thẩm định.', 'success');
+      showToast('Xác Thực Quản Trị Viên Thành Công', 'Đã xác thực quyền Admin! Bạn có toàn quyền duyệt đơn & thẩm định.', 'success');
     } else {
       if (adminLoginError) {
-        adminLoginError.innerText = '❌ Mật khẩu quản trị viên không chính xác! Vui lòng thử lại.';
+        adminLoginError.innerText = 'Mật khẩu quản trị viên không chính xác. Vui lòng thử lại.';
         adminLoginError.classList.remove('hidden');
       }
       adminPasswordInput?.focus();
@@ -428,10 +461,10 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleAdminPassBtn.addEventListener('click', () => {
       if (adminPasswordInput.type === 'password') {
         adminPasswordInput.type = 'text';
-        toggleAdminPassBtn.innerText = '🙈';
+        toggleAdminPassBtn.innerHTML = getSvgIcon('eye-off');
       } else {
         adminPasswordInput.type = 'password';
-        toggleAdminPassBtn.innerText = '👁️';
+        toggleAdminPassBtn.innerHTML = getSvgIcon('eye');
       }
     });
   }
@@ -536,10 +569,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
           text: 'Đang chuẩn bị',
           fullName: 'Đang chuẩn bị hàng (Chưa xuất kho)',
-          icon: '📦',
+          icon: getSvgIcon('package'),
           badgeClass: 'status-dang_chuan_bi',
           alertClass: 'alert-cancel',
-          alertTitle: '📦 Hàng chưa xuất kho',
+          alertTitle: 'Hàng chưa xuất kho',
           alertDesc: 'Khi duyệt hoàn tiền: Hệ thống sẽ gửi thông báo HỦY ĐƠN HÀNG cho khách và hủy phiếu xuất kho của Shop. Khách được hoàn tiền ngay, không phát sinh Shipper.',
           actionSummary: 'Hủy đơn hàng kho (Chưa gửi hàng)'
         };
@@ -547,10 +580,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
           text: 'Đang giao hàng',
           fullName: 'Đang giao hàng (Shipper đang vận chuyển)',
-          icon: '🚚',
+          icon: getSvgIcon('truck'),
           badgeClass: 'status-dang_giao',
           alertClass: 'alert-intercept',
-          alertTitle: '🚚 Kiện hàng đang trên đường giao',
+          alertTitle: 'Kiện hàng đang trên đường giao',
           alertDesc: 'Khi duyệt hoàn tiền: Hệ thống gửi lệnh INTERCEPT tới SPX Express DỪNG GIAO HÀNG & CHUYỂN HOÀN về Shop. Đồng thời thông báo khách hàng TỪ CHỐI NHẬN HÀNG nếu shipper gọi.',
           actionSummary: 'Lệnh Shipper dừng giao & Chuyển hoàn'
         };
@@ -559,10 +592,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
           text: 'Đã giao hàng',
           fullName: 'Đã giao hàng thành công',
-          icon: '✅',
+          icon: getSvgIcon('check-circle'),
           badgeClass: 'status-da_giao',
           alertClass: 'alert-return',
-          alertTitle: '✅ Kiện hàng đã giao thành công',
+          alertTitle: 'Kiện hàng đã giao thành công',
           alertDesc: 'Khi duyệt hoàn tiền: Yêu cầu khách đóng gói nguyên vẹn để trả hàng. Hệ thống tự động liên hệ đơn vị Shipper SPX Express điều phối lấy hàng hoàn tận nhà.',
           actionSummary: 'Yêu cầu trả hàng & Shipper thu hồi'
         };
@@ -631,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Welcome Message from Shopee Assistant
     addBotMessage(`
-      Xin chào <strong>${currentCase.name}</strong>! Tôi là Trợ lý AI Hoàn tiền & Trả hàng của Shopee. 👋<br><br>
+      Xin chào <strong>${currentCase.name}</strong>! Tôi là Trợ lý AI Hoàn tiền & Trả hàng của Shopee. <br><br>
       Tôi có thể hỗ trợ bạn xử lý yêu cầu hoàn tiền tự động 24/7 chỉ trong vài phút. Bạn muốn bắt đầu với đơn hàng nào dưới đây?
     `);
 
@@ -692,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <button id="btn-select-order" class="btn-text" style="width: 100%; background: var(--shopee-orange); color: #fff; border: none; padding: 8px; border-radius: 6px; font-weight: 700;">
-          👉 Chọn đơn này để Hoàn tiền
+          Xác nhận chọn đơn hàng này
         </button>
       </div>
     `;
@@ -713,16 +746,16 @@ document.addEventListener('DOMContentLoaded', () => {
         Cảm ơn bạn. Vui lòng cho Shopee biết <strong>Lý do chính xác</strong> bạn muốn trả hàng hoặc hoàn tiền:
         <div class="reason-options-grid">
           <button class="reason-btn" data-reason="${currentCase.reason}">
-            ⚠️ ${currentCase.reason} (Khớp với kịch bản test)
+            ${currentCase.reason} (Hồ sơ mẫu)
           </button>
           <button class="reason-btn" data-reason="Hàng bị bể vỡ, hư hỏng trong quá trình vận chuyển">
-            📦 Hàng bị bể vỡ, hư hỏng trong quá trình vận chuyển
+            Hàng bị bể vỡ, hư hỏng trong quá trình vận chuyển
           </button>
           <button class="reason-btn" data-reason="Hàng lỗi kỹ thuật, không thể sử dụng bình thường">
-            🔌 Hàng lỗi kỹ thuật, không thể sử dụng bình thường
+            Hàng lỗi kỹ thuật, không thể sử dụng bình thường
           </button>
           <button class="reason-btn" data-reason="Nhận hàng thiếu phụ kiện, sai số lượng">
-            🔢 Nhận hàng thiếu phụ kiện, sai số lượng
+            Nhận hàng thiếu phụ kiện, sai số lượng
           </button>
         </div>
       `);
@@ -743,7 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
       addBotMessage(`
         Để bảo vệ quyền lợi của bạn và Shopee có căn cứ phân tích, bạn vui lòng đính kèm <strong>ảnh chụp sản phẩm lỗi</strong> hoặc <strong>video mở hộp (unboxing)</strong>:
         <div class="evidence-upload-zone" id="upload-trigger">
-          <div style="font-size: 28px;">📷</div>
+          <div style="font-size: 28px; color: #94a3b8; display: flex; justify-content: center; margin-bottom: 6px;"><svg class="ui-icon ui-icon-xl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
           <strong>Nhấn vào đây để tải ảnh / video bằng chứng</strong>
           <p>Hỗ trợ JPG, PNG, MP4 (Tối đa 30MB)</p>
           <div class="evidence-preview-wrap">
@@ -752,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <button id="btn-submit-refund" class="btn-text" style="width: 100%; background: var(--shopee-orange); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 700; margin-top: 8px;">
-          🚀 Gửi Yêu Cầu & Bắt Đầu Phân Tích AI
+          Gửi Yêu Cầu & Kích Hoạt Phân Tích AI
         </button>
       `);
 
@@ -783,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Step 1: Ingest Data
     s1.classList.add('active');
-    addBotMessage("🔄 <em>Hệ thống đang tiếp nhận đơn hàng, đồng bộ hóa lịch sử tài khoản và kiểm tra chứng từ...</em>");
+    addBotMessage("<em>Hệ thống đang tiếp nhận đơn hàng, đồng bộ dữ liệu tài khoản và đối soát chứng từ...</em>");
 
     setTimeout(() => {
       // Step 2: Feature Engineering
@@ -821,12 +854,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trường hợp 1: Đang chuẩn bị (Chưa xuất kho) -> Hủy đơn cho khách hàng, shop không gửi hàng, hoàn tiền ngay
         bannerHTML = `
           <div class="decision-banner banner-auto-approved">
-            <div class="banner-icon">📦</div>
+            <div class="banner-icon">${getSvgIcon('package')}</div>
             <div class="banner-content">
               <h5>ĐÃ HỦY ĐƠN HÀNG & PHÊ DUYỆT HOÀN TIỀN TỰ ĐỘNG (100%)</h5>
               <p>
                 Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
-                Tình trạng đơn hàng: <span class="order-status-badge status-dang_chuan_bi">📦 Đang chuẩn bị hàng (Chưa xuất kho)</span><br><br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-dang_chuan_bi">${getSvgIcon('package')} Đang chuẩn bị hàng (Chưa xuất kho)</span><br><br>
                 <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
                 • Hệ thống đã <strong>THÔNG BÁO HỦY ĐƠN HÀNG</strong> thành công đến Người bán (Shop sẽ <strong>không gửi hàng</strong> đi).<br>
                 • Số tiền <strong>${c.order.priceFormatted}</strong> đã được tự động hoàn trả 100% về <strong>Ví ShopeePay / Tài khoản</strong> của bạn.<br>
@@ -839,12 +872,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trường hợp 2: Đang giao hàng -> Lệnh cho shipper dừng giao & chuyển hoàn về shop, báo khách từ chối nhận
         bannerHTML = `
           <div class="decision-banner banner-auto-approved">
-            <div class="banner-icon">🚚</div>
+            <div class="banner-icon">${getSvgIcon('truck')}</div>
             <div class="banner-content">
               <h5>HOÀN TIỀN TỰ ĐỘNG ĐÃ DUYỆT - PHÁT LỆNH SHIPPER DỪNG GIAO HÀNG</h5>
               <p>
                 Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
-                Tình trạng đơn hàng: <span class="order-status-badge status-dang_giao">🚚 Đang giao hàng (In Transit)</span><br><br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-dang_giao">${getSvgIcon('truck')} Đang giao hàng (In Transit)</span><br><br>
                 <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
                 • Hệ thống đã <strong>GỬI THÔNG BÁO CHO ĐƠN VỊ SHIPPER (SPX EXPRESS) DỪNG GIAO HÀNG & CHUYỂN HOÀN VỀ CHO SHOP</strong>.<br>
                 • <strong>Khách hàng lưu ý:</strong> Khi Shipper gọi giao hàng, bạn <strong>vui lòng từ chối nhận hàng</strong> (không cần nhận).<br>
@@ -857,12 +890,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Trường hợp 3: Đã giao hàng -> Yêu cầu khách trả hàng, liên hệ shipper đến lấy hàng hoàn
         bannerHTML = `
           <div class="decision-banner banner-auto-approved">
-            <div class="banner-icon">✅</div>
+            <div class="banner-icon">${getSvgIcon('check-circle')}</div>
             <div class="banner-content">
               <h5>YÊU CẦU HOÀN TIỀN ĐÃ XÁC NHẬN - YÊU CẦU TRẢ HÀNG & THU HỒI</h5>
               <p>
                 Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
-                Tình trạng đơn hàng: <span class="order-status-badge status-da_giao">✅ Đã giao hàng thành công</span><br><br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-da_giao">${getSvgIcon('check-circle')} Đã giao hàng thành công</span><br><br>
                 <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
                 • Vì bạn đã nhận hàng, vui lòng <strong>ĐÓNG GÓI SẢN PHẨM NGUYÊN VẸN</strong> để gửi trả lại hàng.<br>
                 • Hệ thống <strong>ĐÃ LIÊN HỆ ĐƠN VỊ SHIPPER (SPX EXPRESS)</strong>: Shipper sẽ đến tận địa chỉ của bạn để nhận lại hàng hoàn (Mã thu hồi: <strong>RET-${c.order.code}</strong>). Bạn cũng có thể gửi miễn phí tại bưu cục SPX gần nhất.<br>
@@ -875,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (c.decisionType === 'need_evidence') {
       bannerHTML = `
         <div class="decision-banner banner-need-evidence">
-          <div class="banner-icon">⚠️</div>
+          <div class="banner-icon">${getSvgIcon('alert-triangle')}</div>
           <div class="banner-content">
             <h5>YÊU CẦU BỔ SUNG THÊM BẰNG CHỨNG</h5>
             <p>
@@ -888,7 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (c.decisionType === 'agent_review') {
       bannerHTML = `
         <div class="decision-banner banner-agent-review">
-          <div class="banner-icon">🛡️</div>
+          <div class="banner-icon">${getSvgIcon('shield')}</div>
           <div class="banner-content">
             <h5>ĐANG CHUYỂN CHUYÊN VIÊN CSKH THẨM ĐỊNH (SLA 24H)</h5>
             <p>
@@ -902,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (c.decisionType === 'fraud_freeze') {
       bannerHTML = `
         <div class="decision-banner banner-fraud-flagged">
-          <div class="banner-icon">🚨</div>
+          <div class="banner-icon">${getSvgIcon('shield-alert')}</div>
           <div class="banner-content">
             <h5>YÊU CẦU ĐANG ĐƯỢC TỔ ĐIỀU TRA CHUYÊN SÂU XỬ LÝ</h5>
             <p>
@@ -1024,7 +1057,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fStatus = currentCase.order.fulfillmentStatus || 'dang_giao';
       if (fStatus === 'dang_chuan_bi') {
         addBotMessage(`
-          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>📦 Đang chuẩn bị hàng (Chưa xuất kho)</strong>.<br><br>
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>Đang chuẩn bị hàng (Chưa xuất kho)</strong>.<br><br>
           Vì đơn hàng chưa giao cho bên vận chuyển, khi được xác nhận hoàn tiền:<br>
           • Hệ thống tự động <strong>HỦY ĐƠN HÀNG NGAY LẬP TỨC</strong> và gửi thông báo cho Người bán (Shop sẽ <strong>không gửi hàng đi</strong>).<br>
           • Số tiền <strong>${currentCase.order.priceFormatted}</strong> được hoàn trả 100% về tài khoản/Ví ShopeePay của bạn.<br>
@@ -1033,7 +1066,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       } else if (fStatus === 'dang_giao') {
         addBotMessage(`
-          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>🚚 Đang giao hàng (In Transit)</strong>.<br><br>
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>Đang giao hàng (In Transit)</strong>.<br><br>
           Vì kiện hàng đang trên đường giao, khi được xác nhận hoàn tiền:<br>
           • Hệ thống đã <strong>GỬI THÔNG BÁO CHO ĐƠN VỊ SHIPPER (SPX EXPRESS) DỪNG GIAO HÀNG & CHUYỂN HOÀN KIỆN HÀNG VỀ CHO SHOP</strong>.<br>
           • <strong>Lưu ý quan trọng:</strong> Nếu Shipper liên hệ giao hàng, bạn <strong>vui lòng TỪ CHỐI NHẬN HÀNG</strong> giúp Shopee nhé!<br>
@@ -1042,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       } else {
         addBotMessage(`
-          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện ở trạng thái <strong>✅ Đã giao hàng thành công</strong>.<br><br>
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện ở trạng thái <strong>Đã giao hàng thành công</strong>.<br><br>
           Vì bạn đã nhận hàng, khi yêu cầu hoàn tiền được xác nhận:<br>
           • Bạn vui lòng <strong>ĐÓNG GÓI SẢN PHẨM NGUYÊN VẸN</strong> để thực hiện trả lại hàng.<br>
           • Hệ thống <strong>ĐÃ LIÊN HỆ ĐƠN VỊ SHIPPER (SPX EXPRESS)</strong>: Shipper sẽ được điều phối đến tận nhà bạn để nhận lại kiện hàng hoàn trả (Mã thu hồi: <strong>RET-${currentCase.order.code}</strong>). Bạn cũng có thể gửi miễn phí tại bưu cục SPX gần nhất.<br>
@@ -1103,8 +1136,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lower.includes('bể') || lower.includes('vỡ') || lower.includes('móp') || lower.includes('trầy') || lower.includes('rách') || lower.includes('hỏng') || lower.includes('nứt')) {
       addBotMessage(`
         Shopee rất tiếc về sự cố sản phẩm bị hư hỏng trong quá trình vận chuyển!<br><br>
-        👉 <strong>Cách xử lý nhanh nhất:</strong><br>
-        1. Bạn bấm nút <strong>"📦 Yêu cầu Trả hàng / Hoàn tiền"</strong> phía trên.<br>
+        <strong>Cách thức xử lý:</strong><br>
+        1. Bạn bấm nút <strong>"Yêu cầu Trả hàng / Hoàn tiền"</strong> phía trên.<br>
         2. Chọn lý do: <em>"Hàng bị hư hỏng / bể vỡ trong quá trình vận chuyển"</em>.<br>
         3. Tải lên <strong>ảnh chụp 6 mặt kiện hàng</strong> + <strong>phiếu giao hàng SPX</strong> + <strong>ảnh/video chi tiết chỗ nứt vỡ</strong>.<br><br>
         Shopee sẽ đối chiếu với đơn vị vận chuyển để hoàn tiền 100% cho bạn!
@@ -1116,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lower.includes('sai') || lower.includes('nhầm') || lower.includes('thiếu') || lower.includes('không đúng') || lower.includes('khác mẫu')) {
       addBotMessage(`
         Trường hợp Shop giao sai sản phẩm, màu sắc, kích cỡ hoặc thiếu phụ kiện, bạn hoàn toàn được <strong>đổi trả miễn phí 100%</strong>!<br><br>
-        👉 Bạn vui lòng chụp ảnh sản phẩm thực tế nhận được bên cạnh mã vận đơn trên hộp hàng, sau đó gửi yêu cầu hoàn tiền. Shopee sẽ yêu cầu Người bán gửi bù phụ kiện hoặc hoàn lại toàn bộ số tiền đơn hàng cho bạn.
+        Bạn vui lòng chụp ảnh sản phẩm thực tế nhận được bên cạnh mã vận đơn trên hộp hàng, sau đó gửi yêu cầu hoàn tiền. Shopee sẽ yêu cầu Người bán gửi bù phụ kiện hoặc hoàn lại toàn bộ số tiền đơn hàng cho bạn.
       `);
       return;
     }
@@ -1135,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lower.includes('đổi ý') || lower.includes('không thích') || lower.includes('không vừa') || lower.includes('chật') || lower.includes('rộng')) {
       addBotMessage(`
         Bạn hoàn toàn có thể trả hàng với lý do <strong>"Đổi ý / Không còn nhu cầu"</strong> theo chính sách mới của Shopee!<br><br>
-        📌 <strong>Điều kiện áp dụng:</strong><br>
+        <strong>Điều kiện áp dụng:</strong><br>
         - Sản phẩm còn nguyên bao bì, tem mác và chưa qua giặt tẩy, sử dụng.<br>
         - Áp dụng cho hầu hết các ngành hàng thời trang, phụ kiện, gia dụng (ngoại trừ đồ lót, thực phẩm và voucher điện tử).
       `);
@@ -1148,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Khi yêu cầu trả hàng được chấp thuận, bạn có <strong>2 phương thức trả hàng cực kỳ thuận tiện</strong>:<br><br>
         1. <strong>Shipper đến lấy hàng tận nhà (SPX Express):</strong> Shipper sẽ liên hệ theo số điện thoại của bạn để tới lấy hàng hoàn trong vòng 1-2 ngày làm việc.<br>
         2. <strong>Tự gửi tại điểm bưu cục:</strong> Bạn mang kiện hàng đến điểm bưu cục SPX hoặc Viettel Post gần nhất, chỉ cần đọc mã vận đơn trả hàng hiển thị trên ứng dụng Shopee.<br><br>
-        🚚 <strong>Cước phí vận chuyển trả hàng là MIỄN PHÍ 100%</strong>.
+        • <strong>Cước phí vận chuyển hoàn trả:</strong> Miễn phí 100% qua đơn vị SPX Express.
       `);
       return;
     }
@@ -1157,10 +1190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lower.includes('bao lâu') || lower.includes('mấy ngày') || lower.includes('tiền về') || lower.includes('shopeepay') || lower.includes('ngân hàng') || lower.includes('khi nào nhận được')) {
       addBotMessage(`
         Thời gian hoàn tiền tùy thuộc vào phương thức bạn đã dùng để thanh toán đơn hàng:<br><br>
-        - 💳 <strong>Ví ShopeePay / Số dư tài khoản Shopee:</strong> Hoàn tiền ngay trong <strong>1 - 24 giờ</strong>.<br>
-        - 🏦 <strong>Tài khoản Ngân hàng (ATM nội địa):</strong> Từ <strong>3 - 5 ngày làm việc</strong>.<br>
-        - 💳 <strong>Thẻ Quốc tế (Visa / Mastercard):</strong> Từ <strong>7 - 14 ngày làm việc</strong> tùy ngân hàng phát hành thẻ của bạn.<br>
-        - 💵 <strong>Thanh toán khi nhận hàng (COD):</strong> Tiền sẽ được hoàn trực tiếp vào Ví ShopeePay hoặc Số Dư Tài Khoản Shopee của bạn.
+        • <strong>Ví ShopeePay / Số dư Shopee:</strong> Hoàn tất trong <strong>1 - 24 giờ</strong>.<br>
+        • <strong>Tài khoản Ngân hàng (ATM nội địa):</strong> Từ <strong>3 - 5 ngày làm việc</strong>.<br>
+        • <strong>Thẻ Quốc tế (Visa / Mastercard):</strong> Từ <strong>7 - 14 ngày làm việc</strong>.<br>
+        • <strong>Thanh toán khi nhận hàng (COD):</strong> Tiền sẽ được hoàn trực tiếp vào Ví ShopeePay hoặc Số Dư Tài Khoản Shopee của bạn.
       `);
       return;
     }
@@ -1177,15 +1210,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 13. Hỏi về thông tin đơn hàng / trạng thái hoàn tiền của chính mình
     if (lower.includes('đơn của tôi') || lower.includes('tiến độ') || lower.includes('trạng thái') || lower.includes('hoàn tiền chưa') || lower.includes('được hoàn tiền không')) {
       addBotMessage(`
-        <strong>📋 Thông Tin Hồ Sơ Hoàn Tiền Hiện Tại:</strong><br><br>
+        <strong>Thông Tin Hồ Sơ Khiếu Nại:</strong><br><br>
         - <strong>Khách hàng:</strong> ${currentCase.name} (#${currentCase.custId})<br>
         - <strong>Đơn hàng:</strong> #${currentCase.order.code} - ${currentCase.order.product}<br>
         - <strong>Giá trị:</strong> ${currentCase.order.priceFormatted}<br>
         - <strong>Đánh giá rủi ro AI:</strong> <strong>${currentCase.riskScore}% (${currentCase.riskLevel.toUpperCase()})</strong><br>
         - <strong>Hướng xử lý:</strong> ${currentCase.aiRecommendation}<br><br>
         ${currentCase.riskLevel === 'low' 
-          ? '🎉 Đơn hàng của bạn thuộc nhóm Rủi ro thấp (&lt;25%), hệ thống sẽ tự động hoàn tiền về ví ShopeePay ngay sau khi bạn xác nhận gửi yêu cầu!' 
-          : '🔍 Hồ sơ của bạn đang được chuyển đến Chuyên viên CSKH để đối chiếu chứng từ và sẽ có kết quả phản hồi trong vòng 24 giờ.'}
+          ? 'Đơn hàng của bạn thuộc nhóm Rủi ro thấp (&lt;25%), hệ thống sẽ tự động phê duyệt hoàn tiền ngay sau khi xác nhận yêu cầu!' 
+          : 'Hồ sơ của bạn đang được chuyển đến Chuyên viên CSKH để đối chiếu chứng từ và sẽ có kết quả phản hồi trong vòng 24 giờ.'}
       `);
       return;
     }
@@ -1206,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 15. Cảm ơn / Tạm biệt
     if (lower.includes('cảm ơn') || lower.includes('thank') || lower.includes('tks') || lower.includes('tạm biệt') || lower.includes('ok')) {
       addBotMessage(`
-        Dạ không có gì ạ! Rất vui được hỗ trợ bạn. Chúc bạn có trải nghiệm mua sắm an tâm và tuyệt vời tại Shopee nhé! Nếu cần thêm bất kỳ sự trợ giúp nào, bạn cứ nhắn mình ngay nha! ❤️
+        Dạ không có gì ạ! Rất vui được hỗ trợ bạn. Chúc bạn có trải nghiệm mua sắm an tâm và tuyệt vời tại Shopee nhé! Nếu cần thêm bất kỳ sự trợ giúp nào, bạn vui lòng phản hồi tại đây.
       `);
       return;
     }
@@ -1214,7 +1247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 16. Phản hồi thông minh đa nhiệm mở rộng cho các câu hỏi bất kỳ
     addBotMessage(`
       Mình đã tiếp nhận câu hỏi của bạn: <em>"${text}"</em>.<br><br>
-      Về vấn đề này trong quy trình mua sắm Shopee, bạn có thể hoàn toàn yên tâm. Nếu đơn hàng <strong>${currentCase.order.product}</strong> của bạn gặp bất kỳ vấn đề gì về chất lượng, hư hỏng hoặc sai khác so với mô tả, bạn chỉ cần bấm nút <strong>"📦 Yêu cầu Trả hàng / Hoàn tiền"</strong> để Shopee bảo vệ quyền lợi thanh toán của bạn ngay lập tức!
+      Về vấn đề này trong quy trình mua sắm Shopee, bạn có thể hoàn toàn yên tâm. Nếu đơn hàng <strong>${currentCase.order.product}</strong> của bạn gặp bất kỳ vấn đề gì về chất lượng, hư hỏng hoặc sai khác so với mô tả, bạn chỉ cần bấm nút <strong>"Yêu cầu Trả hàng / Hoàn tiền"</strong> để Shopee bảo vệ quyền lợi thanh toán của bạn ngay lập tức.
     `);
   }
 
@@ -1271,16 +1304,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
 
     const icons = {
-      success: '✅',
-      warning: '⚠️',
-      danger: '🚨',
-      info: '🛒'
+      success: getSvgIcon('check-circle'),
+      warning: getSvgIcon('alert-triangle'),
+      danger: getSvgIcon('shield-alert'),
+      info: getSvgIcon('chat')
     };
 
     const toast = document.createElement('div');
     toast.className = `toast-message toast-${type}`;
     toast.innerHTML = `
-      <div class="toast-icon">${icons[type] || '🔔'}</div>
+      <div class="toast-icon">${icons[type] || getSvgIcon('info')}</div>
       <div class="toast-body">
         <div class="toast-title">${title}</div>
         <div class="toast-text">${message}</div>
@@ -1344,7 +1377,7 @@ document.addEventListener('DOMContentLoaded', () => {
       queueTableBody.innerHTML = `
         <tr>
           <td colspan="6" style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 13px;">
-            🔍 Không tìm thấy đơn hàng nào phù hợp với điều kiện lọc & tìm kiếm.
+            Không tìm thấy đơn hàng nào phù hợp với điều kiện lọc & tìm kiếm.
           </td>
         </tr>
       `;
@@ -1457,10 +1490,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <textarea id="staff-note" placeholder="Nhập ghi chú thẩm định hoặc lý do điều chỉnh..." style="width: 100%; height: 60px; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px; font-family: inherit; margin-bottom: 8px;"></textarea>
 
         <div class="staff-actions-grid">
-          <button class="btn-action-approve" id="act-approve">✅ Duyệt Hoàn Tiền</button>
-          <button class="btn-action-more-info" id="act-more-info">⚠️ Yêu Cầu Bổ Sung</button>
-          <button class="btn-action-reject" id="act-reject">📦 Yêu Cầu Trả Hàng</button>
-          <button class="btn-action-fraud-freeze" id="act-freeze">🔒 Khóa & Báo Fraud</button>
+          <button class="btn-action-approve" id="act-approve">${getSvgIcon('check-circle')} Duyệt Hoàn Tiền</button>
+          <button class="btn-action-more-info" id="act-more-info">${getSvgIcon('help-circle')} Yêu Cầu Bổ Sung</button>
+          <button class="btn-action-reject" id="act-reject">${getSvgIcon('package')} Yêu Cầu Trả Hàng</button>
+          <button class="btn-action-fraud-freeze" id="act-freeze">${getSvgIcon('lock')} Khóa & Báo Fraud</button>
         </div>
       </div>
     `;
@@ -1659,7 +1692,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const json = await resp.json();
           if (json && json.data && Object.keys(json.data).length > 0) {
             Object.assign(testCasesData, json.data);
-            console.log('⚡ Đang nạp dữ liệu từ Backend:', json.source);
+            console.log('Đang nạp dữ liệu từ Backend:', json.source);
           }
         }
       }
