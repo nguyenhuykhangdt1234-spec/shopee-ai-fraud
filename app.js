@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
         price: 149000,
         priceFormatted: "₫149.000",
         shop: "Coolmate Official Store",
-        deliveredTime: "2 giờ trước"
+        deliveredTime: "2 giờ trước",
+        fulfillmentStatus: "dang_giao",
+        fulfillmentStatusText: "Đang giao hàng (In Transit)"
       },
       reason: "Giao sai màu sắc (Đặt màu Đen nhưng nhận màu Trắng)",
       evidenceImg: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=180&q=80",
@@ -60,7 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         price: 420000,
         priceFormatted: "₫420.000",
         shop: "Baseus Flagship Store",
-        deliveredTime: "1 ngày trước"
+        deliveredTime: "1 ngày trước",
+        fulfillmentStatus: "da_giao",
+        fulfillmentStatusText: "Đã giao hàng"
       },
       reason: "Tai nghe bên trái không lên nguồn, không sạc được",
       evidenceImg: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=180&q=80",
@@ -99,7 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
         price: 2650000,
         priceFormatted: "₫2.650.000",
         shop: "Điện Máy Gia Dụng Store",
-        deliveredTime: "5 giờ trước"
+        deliveredTime: "5 giờ trước",
+        fulfillmentStatus: "da_giao",
+        fulfillmentStatusText: "Đã giao hàng"
       },
       reason: "Hàng bị móp méo vỏ nhựa, trầy xước nặng và không hoạt động",
       evidenceImg: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=180&q=80",
@@ -138,7 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         price: 18490000,
         priceFormatted: "₫18.490.000",
         shop: "Apple Flagship Store",
-        deliveredTime: "30 phút trước"
+        deliveredTime: "30 phút trước",
+        fulfillmentStatus: "dang_chuan_bi",
+        fulfillmentStatusText: "Đang chuẩn bị hàng (Chưa xuất kho)"
       },
       reason: "Mở kiện hàng ra chỉ thấy hộp giấy rỗng và gạch vụn bên trong",
       evidenceImg: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=180&q=80",
@@ -177,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
         price: 4890000,
         priceFormatted: "₫4.890.000",
         shop: "Thế Giới Công Nghệ Shopee",
-        deliveredTime: "15 phút trước"
+        deliveredTime: "15 phút trước",
+        fulfillmentStatus: "dang_giao",
+        fulfillmentStatusText: "Đang giao hàng (In Transit)"
       },
       reason: "Đeo thử không vừa tay, muốn đổi sang mẫu 44mm và hoàn tiền",
       evidenceImg: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=180&q=80",
@@ -520,7 +530,51 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboardCaseDetail(currentCase);
   }
 
-  function renderSidebarOrders() {
+  
+  // Helper: Tra cứu thông tin hiển thị trạng thái vận hành đơn hàng
+  function getFulfillmentMeta(status) {
+    switch (status) {
+      case 'dang_chuan_bi':
+        return {
+          text: 'Đang chuẩn bị',
+          fullName: 'Đang chuẩn bị hàng (Chưa xuất kho)',
+          icon: '📦',
+          badgeClass: 'status-dang_chuan_bi',
+          alertClass: 'alert-cancel',
+          alertTitle: '📦 Hàng chưa xuất kho',
+          alertDesc: 'Khi duyệt hoàn tiền: Hệ thống sẽ gửi thông báo HỦY ĐƠN HÀNG cho khách và hủy phiếu xuất kho của Shop. Khách được hoàn tiền ngay, không phát sinh Shipper.',
+          actionSummary: 'Hủy đơn hàng kho (Chưa gửi hàng)'
+        };
+      case 'dang_giao':
+        return {
+          text: 'Đang giao hàng',
+          fullName: 'Đang giao hàng (Shipper đang vận chuyển)',
+          icon: '🚚',
+          badgeClass: 'status-dang_giao',
+          alertClass: 'alert-intercept',
+          alertTitle: '🚚 Kiện hàng đang trên đường giao',
+          alertDesc: 'Khi duyệt hoàn tiền: Hệ thống gửi lệnh INTERCEPT tới SPX Express DỪNG GIAO HÀNG & CHUYỂN HOÀN về Shop. Đồng thời thông báo khách hàng TỪ CHỐI NHẬN HÀNG nếu shipper gọi.',
+          actionSummary: 'Lệnh Shipper dừng giao & Chuyển hoàn'
+        };
+      case 'da_giao':
+      default:
+        return {
+          text: 'Đã giao hàng',
+          fullName: 'Đã giao hàng thành công',
+          icon: '✅',
+          badgeClass: 'status-da_giao',
+          alertClass: 'alert-return',
+          alertTitle: '✅ Kiện hàng đã giao thành công',
+          alertDesc: 'Khi duyệt hoàn tiền: Yêu cầu khách đóng gói nguyên vẹn để trả hàng. Hệ thống tự động liên hệ đơn vị Shipper SPX Express điều phối lấy hàng hoàn tận nhà.',
+          actionSummary: 'Yêu cầu trả hàng & Shipper thu hồi'
+        };
+    }
+  }
+
+    function renderSidebarOrders() {
+    const fStatus = currentCase.order.fulfillmentStatus || 'dang_giao';
+    const meta = getFulfillmentMeta(fStatus);
+
     sidebarOrdersList.innerHTML = `
       <div class="order-mini-card selected" id="side-order-${currentCase.order.code}">
         <img class="order-thumb" src="${currentCase.order.image}" alt="Product">
@@ -528,12 +582,52 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="order-name">${currentCase.order.product}</div>
           <div class="order-price">${currentCase.order.priceFormatted}</div>
           <div class="order-meta-info">
-            <span>${currentCase.order.deliveredTime}</span>
-            <span class="text-success">✓ Đã giao</span>
+            <span class="order-status-badge ${meta.badgeClass}">${meta.icon} ${meta.text}</span>
+            <span style="font-size: 11px; color: #64748b;">${currentCase.order.deliveredTime}</span>
+          </div>
+        </div>
+
+        <!-- Bộ chuyển đổi tình trạng đơn hàng để kiểm thử nghiệp vụ -->
+        <div class="order-fulfillment-control">
+          <div class="fulfillment-control-label">
+            <span>Tình trạng đơn hàng:</span>
+            <span style="font-size: 10px; color: var(--shopee-orange); font-weight: 600;">(Đổi để test)</span>
+          </div>
+          <div class="fulfillment-pill-group">
+            <button type="button" class="btn-status-pill ${fStatus === 'dang_chuan_bi' ? 'active' : ''}" data-status="dang_chuan_bi" title="Đơn đang đóng gói, chưa gửi vận chuyển">
+              📦 Chuẩn bị
+            </button>
+            <button type="button" class="btn-status-pill ${fStatus === 'dang_giao' ? 'active' : ''}" data-status="dang_giao" title="Đơn đang trên đường giao, shipper đang vận chuyển">
+              🚚 Đang giao
+            </button>
+            <button type="button" class="btn-status-pill ${fStatus === 'da_giao' ? 'active' : ''}" data-status="da_giao" title="Khách đã nhận kiện hàng thành công">
+              ✅ Đã giao
+            </button>
           </div>
         </div>
       </div>
     `;
+
+    // Gắn sự kiện thay đổi trạng thái đơn hàng để thử nghiệm quy trình
+    sidebarOrdersList.querySelectorAll('.btn-status-pill').forEach(pill => {
+      pill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newStatus = pill.dataset.status;
+        currentCase.order.fulfillmentStatus = newStatus;
+        currentCase.order.fulfillmentStatusText = getFulfillmentMeta(newStatus).fullName;
+
+        // Cập nhật lại giao diện
+        renderSidebarOrders();
+        renderDashboardQueue();
+        renderDashboardCaseDetail(currentCase);
+
+        showToast(
+          '📦 Đã Đổi Tình Trạng Đơn',
+          `Đơn hàng #${currentCase.order.code} chuyển sang: ${getFulfillmentMeta(newStatus).fullName}`,
+          'info'
+        );
+      });
+    });
   }
 
   function updateXAIInspector(c) {
@@ -626,7 +720,12 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="chat-order-details">
             <h5>${order.product}</h5>
             <div class="price">${order.priceFormatted}</div>
-            <small style="color: #64748b;">Mã đơn: ${order.code} • Đã giao ${order.deliveredTime}</small>
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+              <span class="order-status-badge ${getFulfillmentMeta(order.fulfillmentStatus || 'dang_giao').badgeClass}">
+                ${getFulfillmentMeta(order.fulfillmentStatus || 'dang_giao').icon} ${getFulfillmentMeta(order.fulfillmentStatus || 'dang_giao').text}
+              </span>
+              <small style="color: #64748b;">#${order.code}</small>
+            </div>
           </div>
         </div>
         <button id="btn-select-order" class="btn-text" style="width: 100%; background: var(--shopee-orange); color: #fff; border: none; padding: 8px; border-radius: 6px; font-weight: 700;">
@@ -752,19 +851,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let bannerHTML = '';
     if (c.decisionType === 'auto_approve') {
-      bannerHTML = `
-        <div class="decision-banner banner-auto-approved">
-          <div class="banner-icon">✅</div>
-          <div class="banner-content">
-            <h5>YÊU CẦU HOÀN TIỀN ĐƯỢC PHÊ DUYỆT TỰ ĐỘNG</h5>
-            <p>
-              Mô hình AI xác thực: Điểm rủi ro <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
-              Số tiền <strong>${c.order.priceFormatted}</strong> đã được hoàn về <strong>Ví ShopeePay</strong> của bạn.<br>
-              <em>✨ Bạn không cần gửi trả lại sản phẩm. Chúc bạn có trải nghiệm mua sắm tuyệt vời cùng Shopee!</em>
-            </p>
+      const fStatus = c.order.fulfillmentStatus || 'dang_giao';
+      const meta = getFulfillmentMeta(fStatus);
+
+      if (fStatus === 'dang_chuan_bi') {
+        // Trường hợp 1: Đang chuẩn bị (Chưa xuất kho) -> Hủy đơn cho khách hàng, shop không gửi hàng, hoàn tiền ngay
+        bannerHTML = `
+          <div class="decision-banner banner-auto-approved">
+            <div class="banner-icon">📦</div>
+            <div class="banner-content">
+              <h5>ĐÃ HỦY ĐƠN HÀNG & PHÊ DUYỆT HOÀN TIỀN TỰ ĐỘNG (100%)</h5>
+              <p>
+                Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-dang_chuan_bi">📦 Đang chuẩn bị hàng (Chưa xuất kho)</span><br><br>
+                <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
+                • Hệ thống đã <strong>THÔNG BÁO HỦY ĐƠN HÀNG</strong> thành công đến Người bán (Shop sẽ <strong>không gửi hàng</strong> đi).<br>
+                • Số tiền <strong>${c.order.priceFormatted}</strong> đã được tự động hoàn trả 100% về <strong>Ví ShopeePay / Tài khoản</strong> của bạn.<br>
+                • <em>Đơn hàng chưa xuất kho nên không phát sinh Shipper hay quy trình trả hàng.</em>
+              </p>
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      } else if (fStatus === 'dang_giao') {
+        // Trường hợp 2: Đang giao hàng -> Lệnh cho shipper dừng giao & chuyển hoàn về shop, báo khách từ chối nhận
+        bannerHTML = `
+          <div class="decision-banner banner-auto-approved">
+            <div class="banner-icon">🚚</div>
+            <div class="banner-content">
+              <h5>HOÀN TIỀN TỰ ĐỘNG ĐÃ DUYỆT - PHÁT LỆNH SHIPPER DỪNG GIAO HÀNG</h5>
+              <p>
+                Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-dang_giao">🚚 Đang giao hàng (In Transit)</span><br><br>
+                <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
+                • Hệ thống đã <strong>GỬI THÔNG BÁO CHO ĐƠN VỊ SHIPPER (SPX EXPRESS) DỪNG GIAO HÀNG & CHUYỂN HOÀN VỀ CHO SHOP</strong>.<br>
+                • <strong>Khách hàng lưu ý:</strong> Khi Shipper gọi giao hàng, bạn <strong>vui lòng từ chối nhận hàng</strong> (không cần nhận).<br>
+                • Số tiền <strong>${c.order.priceFormatted}</strong> đã được phê duyệt hoàn trả 100% về tài khoản/Ví ShopeePay của bạn.
+              </p>
+            </div>
+          </div>
+        `;
+      } else {
+        // Trường hợp 3: Đã giao hàng -> Yêu cầu khách trả hàng, liên hệ shipper đến lấy hàng hoàn
+        bannerHTML = `
+          <div class="decision-banner banner-auto-approved">
+            <div class="banner-icon">✅</div>
+            <div class="banner-content">
+              <h5>YÊU CẦU HOÀN TIỀN ĐÃ XÁC NHẬN - YÊU CẦU TRẢ HÀNG & THU HỒI</h5>
+              <p>
+                Điểm rủi ro AI: <strong>${c.riskScore}% (Rất thấp)</strong>.<br>
+                Tình trạng đơn hàng: <span class="order-status-badge status-da_giao">✅ Đã giao hàng thành công</span><br><br>
+                <strong>Quy trình xử lý theo tình trạng đơn:</strong><br>
+                • Vì bạn đã nhận hàng, vui lòng <strong>ĐÓNG GÓI SẢN PHẨM NGUYÊN VẸN</strong> để gửi trả lại hàng.<br>
+                • Hệ thống <strong>ĐÃ LIÊN HỆ ĐƠN VỊ SHIPPER (SPX EXPRESS)</strong>: Shipper sẽ đến tận địa chỉ của bạn để nhận lại hàng hoàn (Mã thu hồi: <strong>RET-${c.order.code}</strong>). Bạn cũng có thể gửi miễn phí tại bưu cục SPX gần nhất.<br>
+                • Sau khi Shipper quét mã nhận hàng hoàn, số tiền <strong>${c.order.priceFormatted}</strong> sẽ được giải ngân hoàn tất về ví/tài khoản của bạn.
+              </p>
+            </div>
+          </div>
+        `;
+      }
     } else if (c.decisionType === 'need_evidence') {
       bannerHTML = `
         <div class="decision-banner banner-need-evidence">
@@ -911,6 +1055,39 @@ document.addEventListener('DOMContentLoaded', () => {
   // Xử lý thông minh khi chưa gắn API Key: hiểu ngữ nghĩa đa ngành, hỏi gì đáp nấy, không bị giới hạn kịch bản!
   function handleUserCustomQuery(text) {
     const lower = text.toLowerCase().trim();
+
+    // 0. Nghiệp vụ phản hồi theo tình trạng đơn hàng (Đang chuẩn bị / Đang giao / Đã giao)
+    if (lower.includes('đang giao') || lower.includes('đã giao') || lower.includes('chuẩn bị') || lower.includes('shipper') || lower.includes('dừng giao') || lower.includes('hủy đơn') || lower.includes('trả hàng')) {
+      const fStatus = currentCase.order.fulfillmentStatus || 'dang_giao';
+      if (fStatus === 'dang_chuan_bi') {
+        addBotMessage(`
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>📦 Đang chuẩn bị hàng (Chưa xuất kho)</strong>.<br><br>
+          Vì đơn hàng chưa giao cho bên vận chuyển, khi được xác nhận hoàn tiền:<br>
+          • Hệ thống tự động <strong>HỦY ĐƠN HÀNG NGAY LẬP TỨC</strong> và gửi thông báo cho Người bán (Shop sẽ <strong>không gửi hàng đi</strong>).<br>
+          • Số tiền <strong>${currentCase.order.priceFormatted}</strong> được hoàn trả 100% về tài khoản/Ví ShopeePay của bạn.<br>
+          • <em>Không phát sinh shipper hay thủ tục giao nhận.</em>
+        `);
+        return;
+      } else if (fStatus === 'dang_giao') {
+        addBotMessage(`
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện đang ở trạng thái <strong>🚚 Đang giao hàng (In Transit)</strong>.<br><br>
+          Vì kiện hàng đang trên đường giao, khi được xác nhận hoàn tiền:<br>
+          • Hệ thống đã <strong>GỬI THÔNG BÁO CHO ĐƠN VỊ SHIPPER (SPX EXPRESS) DỪNG GIAO HÀNG & CHUYỂN HOÀN KIỆN HÀNG VỀ CHO SHOP</strong>.<br>
+          • <strong>Lưu ý quan trọng:</strong> Nếu Shipper liên hệ giao hàng, bạn <strong>vui lòng TỪ CHỐI NHẬN HÀNG</strong> giúp Shopee nhé!<br>
+          • Số tiền <strong>${currentCase.order.priceFormatted}</strong> sẽ được hoàn trả 100% về tài khoản của bạn.
+        `);
+        return;
+      } else {
+        addBotMessage(`
+          Dạ, đơn hàng <strong>#${currentCase.order.code}</strong> (${currentCase.order.product}) hiện ở trạng thái <strong>✅ Đã giao hàng thành công</strong>.<br><br>
+          Vì bạn đã nhận hàng, khi yêu cầu hoàn tiền được xác nhận:<br>
+          • Bạn vui lòng <strong>ĐÓNG GÓI SẢN PHẨM NGUYÊN VẸN</strong> để thực hiện trả lại hàng.<br>
+          • Hệ thống <strong>ĐÃ LIÊN HỆ ĐƠN VỊ SHIPPER (SPX EXPRESS)</strong>: Shipper sẽ được điều phối đến tận nhà bạn để nhận lại kiện hàng hoàn trả (Mã thu hồi: <strong>RET-${currentCase.order.code}</strong>). Bạn cũng có thể gửi miễn phí tại bưu cục SPX gần nhất.<br>
+          • Sau khi Shipper quét mã nhận hàng hoàn, tiền hoàn <strong>${currentCase.order.priceFormatted}</strong> sẽ được hoàn tất giải ngân.
+        `);
+        return;
+      }
+    }
 
     // 1. Chào hỏi / Hỏi thăm / Giới thiệu
     if (/^(chào|hi|hello|alo|ê|bạn ơi|ad ơi|cho mình hỏi|bot ơi|bạn là ai|ai đấy)/i.test(lower)) {
@@ -1268,6 +1445,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <div style="font-size: 12px; line-height: 1.6;">
           <strong>Khách hàng:</strong> ${c.name} (Mã KH: #${c.custId})<br>
           <strong>Sản phẩm:</strong> ${c.order.product}<br>
+          <strong>Tình trạng đơn hàng:</strong> <span class="order-status-badge ${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').badgeClass}">${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').icon} ${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').fullName}</span><br>
+          <div class="logistics-action-alert ${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').alertClass}">
+            <span class="alert-icon">${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').icon}</span>
+            <div>
+              <strong>${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').alertTitle}</strong><br>
+              ${getFulfillmentMeta(c.order.fulfillmentStatus || 'dang_giao').alertDesc}
+            </div>
+          </div>
           <strong>Giá trị đơn:</strong> <span style="color: var(--shopee-orange); font-weight: 700;">${c.order.priceFormatted}</span><br>
           <strong>Lý do khiếu nại:</strong> <em>"${c.reason}"</em>
         </div>
@@ -1344,8 +1529,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (actApprove) {
       actApprove.addEventListener('click', (e) => {
         e.preventDefault();
-        sendAudit('Đã phê duyệt hoàn tiền');
-        showToast('Đã Phê Duyệt Hoàn Tiền', `Đơn #${c.order.code} (${c.name}) được duyệt hoàn ${c.order.priceFormatted} về ShopeePay! Dữ liệu đã lưu vào Feedback Loop & SQL Server.`, 'success');
+        const fStatus = c.order.fulfillmentStatus || 'dang_giao';
+        let actionTitle = '';
+        let actionDesc = '';
+        let auditAction = '';
+
+        if (fStatus === 'dang_chuan_bi') {
+          actionTitle = 'Hủy đơn hàng kho & Hoàn tiền';
+          actionDesc = `Đơn #${c.order.code} đang chuẩn bị. Đã thông báo HỦY ĐƠN cho khách ${c.name} & Người bán dừng xuất kho. Hoàn ${c.order.priceFormatted} về ShopeePay!`;
+          auditAction = `[HỦY ĐƠN KHO]: Admin phê duyệt hoàn tiền ${c.order.priceFormatted} cho đơn #${c.order.code} (Đang chuẩn bị). Đã phát lệnh hủy đơn, thông báo Shop không gửi hàng.`;
+        } else if (fStatus === 'dang_giao') {
+          actionTitle = 'Phát lệnh Shipper dừng giao & Hoàn tiền';
+          actionDesc = `Đơn #${c.order.code} đang giao. Đã phát lệnh tới SPX Express DỪNG GIAO HÀNG & CHUYỂN HOÀN về Shop. Đã thông báo khách từ chối nhận hàng.`;
+          auditAction = `[SHIPPER INTERCEPT]: Admin phê duyệt hoàn tiền ${c.order.priceFormatted} cho đơn #${c.order.code} (Đang giao). Gửi lệnh tới SPX Express DỪNG GIAO & CHUYỂN HOÀN về Shop, báo khách từ chối nhận.`;
+        } else {
+          actionTitle = 'Duyệt hoàn tiền & Yêu cầu trả hàng';
+          actionDesc = `Đơn #${c.order.code} đã giao. Đã yêu cầu khách ${c.name} đóng gói trả hàng và tự động điều phối Shipper SPX đến tận nhà lấy hàng hoàn!`;
+          auditAction = `[THU HỒI HÀNG HOÀN]: Admin phê duyệt hoàn tiền ${c.order.priceFormatted} cho đơn #${c.order.code} (Đã giao). Yêu cầu khách trả hàng, tạo mã RET-${c.order.code}, điều phối Shipper SPX lấy hàng.`;
+        }
+
+        sendAudit(auditAction);
+        showToast(actionTitle, actionDesc, 'success');
       });
     }
 

@@ -2430,3 +2430,135 @@ body {
     max-width: 90px;
   }
 }
+
+/* ==================== ORDER FULFILLMENT STATUS STYLES ==================== */
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.order-status-badge.status-dang_chuan_bi {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.order-status-badge.status-dang_giao {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.order-status-badge.status-da_giao {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Status switcher on Customer Sidebar */
+.order-fulfillment-control {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.fulfillment-control-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.fulfillment-pill-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: var(--radius-md);
+}
+
+.btn-status-pill {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 5px 2px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-status-pill:hover {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text-main);
+}
+
+.btn-status-pill.active {
+  background: #ffffff;
+  color: var(--shopee-orange);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-status-pill.active[data-status="dang_chuan_bi"] {
+  color: #b45309;
+}
+
+.btn-status-pill.active[data-status="dang_giao"] {
+  color: #0369a1;
+}
+
+.btn-status-pill.active[data-status="da_giao"] {
+  color: #047857;
+}
+
+/* Logistics Action Banner in Dashboard and Chat */
+.logistics-action-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.logistics-action-alert.alert-cancel {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.logistics-action-alert.alert-intercept {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #075985;
+}
+
+.logistics-action-alert.alert-return {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.logistics-action-alert .alert-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
