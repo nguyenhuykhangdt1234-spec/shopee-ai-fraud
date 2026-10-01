@@ -301,16 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function openLoginModal(role = 'customer', notice = '') {
+  function openLoginModal(role = 'customer') {
     if (!loginModal) return;
     switchModalTab(role);
-    
-    if (notice) {
-      if (loginNoticeText) loginNoticeText.innerText = notice;
-      if (loginNoticeBanner) loginNoticeBanner.classList.remove('hidden');
-    } else {
-      if (loginNoticeBanner) loginNoticeBanner.classList.add('hidden');
-    }
 
     if (adminLoginError) adminLoginError.classList.add('hidden');
     loginModal.classList.remove('hidden');
@@ -459,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetId === 'dashboard-screen' && currentAuthRole !== 'admin') {
         e.preventDefault();
         e.stopPropagation();
-        openLoginModal('admin', '🔒 Bảng điều khiển CSKH & Duyệt rủi ro chỉ dành cho Quản Trị Viên. Vui lòng đăng nhập với mật khẩu: Pasword1234Ki.');
+        openLoginModal('admin');
         return;
       }
 
@@ -577,13 +570,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sidebarOrdersList.innerHTML = `
       <div class="order-mini-card selected" id="side-order-${currentCase.order.code}">
-        <img class="order-thumb" src="${currentCase.order.image}" alt="Product">
-        <div class="order-brief">
-          <div class="order-name">${currentCase.order.product}</div>
-          <div class="order-price">${currentCase.order.priceFormatted}</div>
-          <div class="order-meta-info">
-            <span class="order-status-badge ${meta.badgeClass}">${meta.icon} ${meta.text}</span>
-            <span style="font-size: 11px; color: #64748b;">${currentCase.order.deliveredTime}</span>
+        <div class="order-card-header">
+          <img class="order-thumb" src="${currentCase.order.image}" alt="Product">
+          <div class="order-brief">
+            <div class="order-name" title="${currentCase.order.product}">${currentCase.order.product}</div>
+            <div class="order-price-row">
+              <span class="order-price">${currentCase.order.priceFormatted}</span>
+              <span class="order-status-badge ${meta.badgeClass}">${meta.icon} ${meta.text}</span>
+            </div>
+            <div class="order-meta-info">
+              <span style="font-size: 11px; color: #64748b;">Mã: #${currentCase.order.code}</span>
+              <span style="font-size: 11px; color: #64748b;">${currentCase.order.deliveredTime}</span>
+            </div>
           </div>
         </div>
 
