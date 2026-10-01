@@ -17,16 +17,8 @@ module.exports = async (req, res) => {
   }
 
   const { message, caseContext, customApiKey } = req.body || {};
+  // Use user-provided key, or environment variable, or active Google Gemini key
   const apiKey = (customApiKey && customApiKey.trim()) || process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    // Tell frontend to use smart local semantic fallback
-    res.status(200).json({
-      useFallback: true,
-      message: 'No GEMINI_API_KEY configured in environment or request.'
-    });
-    return;
-  }
 
   if (!message || typeof message !== 'string') {
     res.status(400).json({ error: 'Message is required' });
@@ -41,7 +33,7 @@ module.exports = async (req, res) => {
     const priceFormatted = caseContext?.order?.priceFormatted || '₫189,000';
     const riskScore = caseContext?.riskScore !== undefined ? caseContext.riskScore : 12;
     const riskLevel = caseContext?.riskLevel || 'low';
-    const recommendation = caseContext?.aiRecommendation || 'Tự động duyệt hoàn tiền';
+    const recommendation = caseContext?.aiRecommendation || 'Tự động phê duyệt hoàn tiền';
 
     const systemPrompt = `Bạn là Shopee Assistant AI - Trợ lý trí tuệ nhân tạo chuyên nghiệp của Shopee Việt Nam, hỗ trợ khách hàng trong quy trình Trả hàng & Hoàn tiền và giải đáp các thắc mắc mua sắm.
 
@@ -53,7 +45,7 @@ THÔNG TIN BỐI CẢNH ĐƠN HÀNG CỦA KHÁCH HÀNG HIỆN TẠI (GROUND TRUT
 - Khuyến nghị xử lý của AI: ${recommendation}
 
 QUY TẮC PHẢN HỒI & CHỐNG ẢO GIÁC (ANTI-HALLUCINATION GUARDRAILS):
-1. Bạn trả lời tự nhiên, thân thiện, thông minh, lịch thiệp và thấu cảm như một chuyên viên Chăm sóc khách hàng Shopee hàng đầu. Hỏi gì bạn cũng có thể giải thích và trả lời lưu loát.
+1. Bạn trả lời tự nhiên, thân thiện, thông minh, lịch thiệp và thấu cảm như một chuyên viên Chăm sóc khách hàng Shopee hàng đầu. Hỏi bất kỳ câu gì trên đời bạn cũng có thể giải thích và trả lời lưu loát, thông minh.
 2. TUYỆT ĐỐI KHÔNG BỊA ĐẶT CHÍNH SÁCH (Triệt tiêu ảo giác):
    - Mức hoàn tiền tối đa đúng bằng 100% số tiền thực tế khách hàng đã thanh toán (sau khi trừ voucher/xu). KHÔNG CÓ chính sách hoàn tiền 200% hay bồi thường tiền mặt khống.
    - Với hàng công nghệ / giá trị cao hoặc hàng hư hỏng, người mua BẮT BUỘC phải gửi trả hàng nguyên vẹn qua bưu cục SPX Express hoặc Viettel Post để đồng kiểm trước khi hoàn tiền. KHÔNG ĐƯỢC phép giữ lại hàng đắt tiền mà vẫn nhận tiền hoàn.
@@ -63,47 +55,51 @@ QUY TẮC PHẢN HỒI & CHỐNG ẢO GIÁC (ANTI-HALLUCINATION GUARDRAILS):
 3. Khi khách hỏi về đơn hàng của mình, hãy căn cứ vào thông tin bối cảnh trên để trả lời chính xác số liệu và tình trạng.
 4. Trình bày câu trả lời ngắn gọn, súc tích, dễ đọc bằng tiếng Việt chuẩn mực, có thể dùng thẻ <strong> để làm nổi bật ý quan trọng.`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Try gemini-3.5-flash first, fallback to gemini-3.7-flash
+    const modelsToTry = ['gemini-3.5-flash', 'gemini-3.7-flash'];
+    let lastError = null;
+    let replyText = null;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { text: `${systemPrompt}\n\n[Tin nhắn của khách hàng]: "${message}"\n\n[Hãy trả lời khách hàng]:` }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 600
+    for (const model of modelsToTry) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  { text: `${systemPrompt}\n\n[Tin nhắn của khách hàng]: "${message}"\n\n[Hãy trả lời khách hàng]:` }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.5,
+              maxOutputTokens: 600
+            }
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          replyText = data.candidates[0].content.parts[0].text;
+          break;
+        } else {
+          lastError = data.error?.message || `Model ${model} returned error`;
         }
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Gemini API Error:', data);
-      res.status(200).json({
-        useFallback: true,
-        error: data.error?.message || 'Gemini API call failed'
-      });
-      return;
+      } catch (e) {
+        lastError = e.message;
+      }
     }
 
-    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (replyText) {
       res.status(200).json({ reply: replyText });
     } else {
       res.status(200).json({
         useFallback: true,
-        error: 'No text returned from Gemini'
+        error: lastError || 'Gemini models unavailable'
       });
     }
   } catch (err) {
