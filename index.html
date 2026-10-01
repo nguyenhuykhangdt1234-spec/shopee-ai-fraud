@@ -37,6 +37,7 @@
         </button>
         <button id="tab-dashboard-btn" class="nav-btn" data-target="dashboard-screen">
           <span class="icon">🛡️</span> Quản Trị Viên & CSKH
+          <span id="admin-lock-badge" class="nav-lock-badge" title="Khu vực dành riêng cho Quản Trị Viên (Mật khẩu: Pasword1234Ki)">🔒</span>
           <span id="queue-badge" class="nav-badge">3</span>
         </button>
       </nav>
@@ -85,6 +86,19 @@
             </div>
           </button>
         </div>
+      </div>
+      <!-- User Authentication & Role Indicator -->
+      <div class="user-auth-widget">
+        <div id="auth-status-chip" class="auth-status-chip customer" title="Bấm để chuyển đổi vai trò Khách Hàng / Quản Trị Viên">
+          <span class="auth-role-avatar" id="auth-role-avatar">👤</span>
+          <div class="auth-role-info">
+            <span class="auth-user-title" id="auth-user-title">Nguyễn Thảo My</span>
+            <span class="auth-role-tag" id="auth-role-tag">Khách Hàng</span>
+          </div>
+        </div>
+        <button type="button" id="open-login-btn" class="btn-auth-switch" title="Chuyển đổi vai trò Khách Hàng hoặc Quản Trị Viên">
+          <span class="switch-icon">🔄</span> Đổi vai trò
+        </button>
       </div>
     </div>
   </header>
@@ -424,6 +438,105 @@
 
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="app.js?v=1790816661218"></script>
+  <script src="app.js?v=1790821668402"></script>
+
+  <!-- ==================== LOGIN / ROLE SWITCH MODAL ==================== -->
+  <div id="login-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div class="login-modal-card">
+      <button type="button" id="close-login-modal-btn" class="modal-close-btn" title="Đóng modal">&times;</button>
+      
+      <div class="login-modal-header">
+        <div class="login-logo-wrap">
+          <svg viewBox="0 0 100 120" class="login-shopee-logo" fill="#ee4d2d">
+            <path d="M50 0C36.2 0 25 11.2 25 25V35H10C4.5 35 0 39.5 0 45V110C0 115.5 4.5 120 10 120H90C95.5 120 100 115.5 100 110V45C100 39.5 95.5 35 90 35H75V25C75 11.2 63.8 0 50 0ZM50 12C57.2 12 63 17.8 63 25V35H37V25C37 17.8 42.8 12 50 12ZM50 50C62 50 69 57.5 69 66C69 76 56 81.5 50 85.5C44 89.5 39 92 39 96.5C39 101.5 44 105 51 105C59 105 66 100 66 100L70 109C70 109 61.5 115 50.5 115C37.5 115 28 106.5 28 96C28 85 41 79.5 48 75.5C55 71.5 58 68.5 58 65C58 60.5 53 58 48 58C40.5 58 33 63.5 33 63.5L29 54C29 54 39 50 50 50Z"/>
+          </svg>
+        </div>
+        <h2 id="login-modal-title">Đăng Nhập Phân Quyền</h2>
+        <p class="login-modal-desc">Lựa chọn vai trò: <strong>Khách Hàng</strong> mua sắm hoặc <strong>Quản Trị Viên</strong> CSKH Shopee</p>
+      </div>
+
+      <div id="login-notice-banner" class="login-notice-banner hidden">
+        <span class="notice-icon">⚠️</span>
+        <span id="login-notice-text">Khu vực yêu cầu quyền Quản Trị Viên.</span>
+      </div>
+
+      <!-- Role Switcher Tabs inside Modal -->
+      <div class="login-role-tabs">
+        <button type="button" id="modal-tab-customer" class="role-tab active" data-role="customer">
+          <span class="role-icon">👤</span>
+          <div class="role-tab-text">
+            <strong>Khách Hàng</strong>
+            <small>Chatbot & Khiếu nại</small>
+          </div>
+        </button>
+        <button type="button" id="modal-tab-admin" class="role-tab" data-role="admin">
+          <span class="role-icon">🛡️</span>
+          <div class="role-tab-text">
+            <strong>Quản Trị Viên</strong>
+            <small>Dashboard & Duyệt đơn</small>
+          </div>
+        </button>
+      </div>
+
+      <!-- Form 1: Khách Hàng -->
+      <form id="form-login-customer" class="login-form active">
+        <div class="form-group">
+          <label for="cust-account-select">Chọn hồ sơ Khách Hàng:</label>
+          <select id="cust-account-select" class="form-control">
+            <option value="1">Nguyễn Thảo My (#CUST-98241) - Khách VIP uy tín (Rủi ro Thấp 12%)</option>
+            <option value="2">Trần Hoài Nam (#CUST-77412) - Áo khoác lỗi chỉ (Rủi ro TB 42%)</option>
+            <option value="3">Lê Quốc Hưng (#CUST-33190) - Điện thoại nghi vấn (Rủi ro Cao 74%)</option>
+            <option value="4">Phạm Văn Đạt (#CUST-11928) - Nghi vấn Fraud Ring (Rủi ro Rất cao 91%)</option>
+            <option value="5">Vũ Minh Tuấn (#CUST-55104) - Khách mới Cold-Start (Rủi ro Cao 68%)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="cust-password">Mật khẩu khách hàng:</label>
+          <input type="password" id="cust-password" class="form-control" value="123456" placeholder="Mật khẩu (mặc định 123456)">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="btn-submit-customer" class="btn-login-submit customer">
+            🛍️ Đăng Nhập Vai Khách Hàng
+          </button>
+        </div>
+      </form>
+
+      <!-- Form 2: Quản Trị Viên -->
+      <form id="form-login-admin" class="login-form">
+        <div class="form-group">
+          <label for="admin-username">Tài khoản Quản Trị Viên / CSKH:</label>
+          <input type="text" id="admin-username" class="form-control" value="admin_shopee" placeholder="Tên đăng nhập admin">
+        </div>
+
+        <div class="form-group">
+          <label for="admin-password">Mật khẩu Quản Trị Viên: <span class="required">*</span></label>
+          <div class="password-input-wrap">
+            <input type="password" id="admin-password" class="form-control" placeholder="Nhập mật khẩu quản trị viên" autocomplete="current-password">
+            <button type="button" id="toggle-admin-pass-btn" class="toggle-pass-btn" title="Hiện/ẩn mật khẩu">👁️</button>
+          </div>
+          <div class="password-hint-box">
+            <span>💡 Mật khẩu quản trị viên là: <code>Pasword1234Ki</code></span>
+          </div>
+          <div id="admin-login-error" class="login-error-msg hidden"></div>
+        </div>
+
+        <div class="form-actions-admin">
+          <button type="submit" id="btn-submit-admin" class="btn-login-submit admin">
+            🔐 Đăng Nhập Quản Trị Viên
+          </button>
+          <button type="button" id="btn-quick-admin-login" class="btn-quick-admin">
+            ⚡ Đăng nhập nhanh Quản trị viên (1-Click)
+          </button>
+        </div>
+      </form>
+      
+      <div class="modal-footer-note">
+        <span>🛡️ Hệ thống bảo mật phân quyền RBAC đa cấp độ Shopee AI Fraud Shield</span>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

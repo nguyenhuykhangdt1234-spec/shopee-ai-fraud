@@ -246,14 +246,218 @@ document.addEventListener('DOMContentLoaded', () => {
   const caseDetailContent = document.getElementById('case-detail-content');
   const selectedCaseBadge = document.getElementById('selected-case-badge');
 
-  // ==================== NAVIGATION TABS ====================
+  // ==================== AUTHENTICATION & ROLE-BASED ACCESS CONTROL (RBAC) ====================
+  let currentAuthRole = localStorage.getItem('shopee_auth_role') || 'customer'; // 'customer' | 'admin'
+  let currentAuthName = localStorage.getItem('shopee_auth_name') || 'Nguyễn Thảo My';
+
+  // Auth Header Elements
+  const authStatusChip = document.getElementById('auth-status-chip');
+  const authRoleAvatar = document.getElementById('auth-role-avatar');
+  const authUserTitle = document.getElementById('auth-user-title');
+  const authRoleTag = document.getElementById('auth-role-tag');
+  const openLoginBtn = document.getElementById('open-login-btn');
+  const adminLockBadge = document.getElementById('admin-lock-badge');
+
+  // Modal Elements
+  const loginModal = document.getElementById('login-modal');
+  const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
+  const loginNoticeBanner = document.getElementById('login-notice-banner');
+  const loginNoticeText = document.getElementById('login-notice-text');
+  const modalTabCustomer = document.getElementById('modal-tab-customer');
+  const modalTabAdmin = document.getElementById('modal-tab-admin');
+  const formLoginCustomer = document.getElementById('form-login-customer');
+  const formLoginAdmin = document.getElementById('form-login-admin');
+  const custAccountSelect = document.getElementById('cust-account-select');
+  const adminUsernameInput = document.getElementById('admin-username');
+  const adminPasswordInput = document.getElementById('admin-password');
+  const toggleAdminPassBtn = document.getElementById('toggle-admin-pass-btn');
+  const adminLoginError = document.getElementById('admin-login-error');
+  const btnQuickAdminLogin = document.getElementById('btn-quick-admin-login');
+
+  function updateAuthUI() {
+    if (!authStatusChip) return;
+    if (currentAuthRole === 'admin') {
+      authStatusChip.className = 'auth-status-chip admin';
+      if (authRoleAvatar) authRoleAvatar.innerText = '🛡️';
+      if (authUserTitle) authUserTitle.innerText = 'Chuyên Viên CSKH';
+      if (authRoleTag) authRoleTag.innerText = 'Quản Trị Viên';
+      if (adminLockBadge) adminLockBadge.style.display = 'none';
+    } else {
+      authStatusChip.className = 'auth-status-chip customer';
+      if (authRoleAvatar) authRoleAvatar.innerText = '👤';
+      if (authUserTitle) authUserTitle.innerText = currentCase?.name || currentAuthName || 'Nguyễn Thảo My';
+      if (authRoleTag) authRoleTag.innerText = 'Khách Hàng';
+      if (adminLockBadge) adminLockBadge.style.display = 'inline-flex';
+    }
+  }
+
+  function openLoginModal(role = 'customer', notice = '') {
+    if (!loginModal) return;
+    switchModalTab(role);
+    
+    if (notice) {
+      if (loginNoticeText) loginNoticeText.innerText = notice;
+      if (loginNoticeBanner) loginNoticeBanner.classList.remove('hidden');
+    } else {
+      if (loginNoticeBanner) loginNoticeBanner.classList.add('hidden');
+    }
+
+    if (adminLoginError) adminLoginError.classList.add('hidden');
+    loginModal.classList.remove('hidden');
+
+    if (role === 'admin') {
+      setTimeout(() => adminPasswordInput?.focus(), 150);
+    }
+  }
+
+  function closeLoginModal() {
+    if (loginModal) loginModal.classList.add('hidden');
+  }
+
+  function switchModalTab(role) {
+    if (role === 'admin') {
+      modalTabCustomer?.classList.remove('active');
+      modalTabAdmin?.classList.add('active');
+      formLoginCustomer?.classList.remove('active');
+      formLoginAdmin?.classList.add('active');
+    } else {
+      modalTabAdmin?.classList.remove('active');
+      modalTabCustomer?.classList.add('active');
+      formLoginAdmin?.classList.remove('active');
+      formLoginCustomer?.classList.add('active');
+    }
+  }
+
+  function loginAsCustomer(caseId) {
+    currentAuthRole = 'customer';
+    currentCaseId = caseId;
+    currentCase = testCasesData[caseId];
+    currentAuthName = currentCase.name;
+
+    localStorage.setItem('shopee_auth_role', 'customer');
+    localStorage.setItem('shopee_auth_name', currentAuthName);
+
+    loadTestCase(caseId);
+    updateAuthUI();
+    closeLoginModal();
+
+    // Switch to customer chat screen
+    const chatBtn = document.getElementById('tab-chat-btn');
+    if (chatBtn) chatBtn.click();
+    showToast('🛍️ Đăng Nhập Thành Công', `Đã đăng nhập vai Khách Hàng: ${currentCase.name}`, 'success');
+  }
+
+  function loginAsAdmin(password) {
+    const trimmed = (password || '').trim();
+    if (trimmed === 'Pasword1234Ki' || trimmed === 'Password1234Ki') {
+      currentAuthRole = 'admin';
+      currentAuthName = 'Chuyên Viên CSKH Shopee (Admin)';
+      localStorage.setItem('shopee_auth_role', 'admin');
+      localStorage.setItem('shopee_auth_name', currentAuthName);
+
+      updateAuthUI();
+      closeLoginModal();
+      
+      // Auto open Admin Dashboard
+      const dashBtn = document.getElementById('tab-dashboard-btn');
+      if (dashBtn) {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        viewSections.forEach(s => s.classList.remove('active'));
+        dashBtn.classList.add('active');
+        const targetScreen = document.getElementById('dashboard-screen');
+        if (targetScreen) targetScreen.classList.add('active');
+      }
+
+      showToast('🛡️ Đăng Nhập Quản Trị Viên Thành Công', 'Đã xác thực quyền Admin! Bạn có toàn quyền duyệt đơn & thẩm định.', 'success');
+    } else {
+      if (adminLoginError) {
+        adminLoginError.innerText = '❌ Mật khẩu quản trị viên không chính xác! Vui lòng nhập: Pasword1234Ki';
+        adminLoginError.classList.remove('hidden');
+      }
+      adminPasswordInput?.focus();
+    }
+  }
+
+  // Bind Login Trigger Events
+  if (openLoginBtn) {
+    openLoginBtn.addEventListener('click', () => openLoginModal(currentAuthRole));
+  }
+  if (authStatusChip) {
+    authStatusChip.addEventListener('click', () => openLoginModal(currentAuthRole));
+  }
+  if (closeLoginModalBtn) {
+    closeLoginModalBtn.addEventListener('click', closeLoginModal);
+  }
+  if (loginModal) {
+    loginModal.addEventListener('click', (e) => {
+      if (e.target === loginModal) closeLoginModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && loginModal && !loginModal.classList.contains('hidden')) {
+      closeLoginModal();
+    }
+  });
+
+  if (modalTabCustomer) {
+    modalTabCustomer.addEventListener('click', () => switchModalTab('customer'));
+  }
+  if (modalTabAdmin) {
+    modalTabAdmin.addEventListener('click', () => switchModalTab('admin'));
+  }
+
+  if (formLoginCustomer) {
+    formLoginCustomer.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const selectedCaseId = parseInt(custAccountSelect?.value) || 1;
+      loginAsCustomer(selectedCaseId);
+    });
+  }
+
+  if (formLoginAdmin) {
+    formLoginAdmin.addEventListener('submit', (e) => {
+      e.preventDefault();
+      loginAsAdmin(adminPasswordInput?.value);
+    });
+  }
+
+  if (btnQuickAdminLogin) {
+    btnQuickAdminLogin.addEventListener('click', () => {
+      if (adminPasswordInput) adminPasswordInput.value = 'Pasword1234Ki';
+      loginAsAdmin('Pasword1234Ki');
+    });
+  }
+
+  if (toggleAdminPassBtn) {
+    toggleAdminPassBtn.addEventListener('click', () => {
+      if (adminPasswordInput.type === 'password') {
+        adminPasswordInput.type = 'text';
+        toggleAdminPassBtn.innerText = '🙈';
+      } else {
+        adminPasswordInput.type = 'password';
+        toggleAdminPassBtn.innerText = '👁️';
+      }
+    });
+  }
+
+  // ==================== NAVIGATION TABS WITH RBAC ====================
   tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      const targetId = btn.dataset.target;
+      
+      // Role-Based Access Control: Protect Admin Dashboard
+      if (targetId === 'dashboard-screen' && currentAuthRole !== 'admin') {
+        e.preventDefault();
+        e.stopPropagation();
+        openLoginModal('admin', '🔒 Bảng điều khiển CSKH & Duyệt rủi ro chỉ dành cho Quản Trị Viên. Vui lòng đăng nhập với mật khẩu: Pasword1234Ki.');
+        return;
+      }
+
       tabButtons.forEach(b => b.classList.remove('active'));
       viewSections.forEach(s => s.classList.remove('active'));
 
       btn.classList.add('active');
-      const targetScreen = document.getElementById(btn.dataset.target);
+      const targetScreen = document.getElementById(targetId);
       if (targetScreen) targetScreen.classList.add('active');
     });
   });
@@ -283,6 +487,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadTestCase(caseId) {
     currentCaseId = caseId;
     currentCase = testCasesData[caseId];
+
+    if (currentAuthRole === 'customer') {
+      currentAuthName = currentCase.name;
+      if (authUserTitle) authUserTitle.innerText = currentCase.name;
+      if (custAccountSelect) custAccountSelect.value = caseId;
+    }
 
     // 1. Update User Profile Sidebar
     userAvatarEl.src = currentCase.avatar;
@@ -1282,6 +1492,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Static fallback
     }
     loadTestCase(1);
+    updateAuthUI();
   }
 
   initApp();
