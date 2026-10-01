@@ -460,14 +460,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Toggle Testcases Dropdown
-  testcaseToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    testcaseMenu.classList.toggle('show');
-  });
+  if (testcaseToggleBtn && testcaseMenu) {
+    testcaseToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      testcaseMenu.classList.toggle('show');
+    });
 
-  document.addEventListener('click', () => {
-    testcaseMenu.classList.remove('show');
-  });
+    document.addEventListener('click', () => {
+      testcaseMenu.classList.remove('show');
+    });
+
+    testcaseItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const caseId = parseInt(item.dataset.case);
+        loadTestCase(caseId);
+        testcaseMenu.classList.remove('show');
+        document.getElementById('tab-chat-btn')?.click();
+      });
+    });
+  }
 
   testcaseItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -579,32 +590,26 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        <!-- Bộ chuyển đổi tình trạng đơn hàng để kiểm thử nghiệp vụ -->
-        <div class="order-fulfillment-control">
-          <div class="fulfillment-control-label">
-            <span>Tình trạng đơn hàng:</span>
-            <span style="font-size: 10px; color: var(--shopee-orange); font-weight: 600;">(Đổi để test)</span>
+        <!-- Trạng thái ngẫu nhiên cho từng khách hàng -->
+        <div class="order-random-status-bar">
+          <div class="random-status-left">
+            <span class="random-badge-label">🎲 Trạng thái ngẫu nhiên:</span>
+            <span class="order-status-badge ${meta.badgeClass}">${meta.icon} ${meta.text}</span>
           </div>
-          <div class="fulfillment-pill-group">
-            <button type="button" class="btn-status-pill ${fStatus === 'dang_chuan_bi' ? 'active' : ''}" data-status="dang_chuan_bi" title="Đơn đang đóng gói, chưa gửi vận chuyển">
-              📦 Chuẩn bị
-            </button>
-            <button type="button" class="btn-status-pill ${fStatus === 'dang_giao' ? 'active' : ''}" data-status="dang_giao" title="Đơn đang trên đường giao, shipper đang vận chuyển">
-              🚚 Đang giao
-            </button>
-            <button type="button" class="btn-status-pill ${fStatus === 'da_giao' ? 'active' : ''}" data-status="da_giao" title="Khách đã nhận kiện hàng thành công">
-              ✅ Đã giao
-            </button>
-          </div>
+          <button type="button" id="btn-re-random-status" class="btn-re-random" title="Bấm để đổi ngẫu nhiên sang trạng thái khác (Chuẩn bị / Đang giao / Đã giao)">
+            🔄 Random khác
+          </button>
         </div>
       </div>
     `;
 
-    // Gắn sự kiện thay đổi trạng thái đơn hàng để thử nghiệm quy trình
-    sidebarOrdersList.querySelectorAll('.btn-status-pill').forEach(pill => {
-      pill.addEventListener('click', (e) => {
+    // Gắn sự kiện nút đổi ngẫu nhiên trạng thái
+    const btnReRandom = sidebarOrdersList.querySelector('#btn-re-random-status');
+    if (btnReRandom) {
+      btnReRandom.addEventListener('click', (e) => {
         e.stopPropagation();
-        const newStatus = pill.dataset.status;
+        const currentStatus = currentCase.order.fulfillmentStatus;
+        const newStatus = getRandomFulfillmentStatus(currentStatus);
         currentCase.order.fulfillmentStatus = newStatus;
         currentCase.order.fulfillmentStatusText = getFulfillmentMeta(newStatus).fullName;
 
@@ -612,14 +617,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSidebarOrders();
         renderDashboardQueue();
         renderDashboardCaseDetail(currentCase);
-
-        showToast(
-          '📦 Đã Đổi Tình Trạng Đơn',
-          `Đơn hàng #${currentCase.order.code} chuyển sang: ${getFulfillmentMeta(newStatus).fullName}`,
-          'info'
-        );
+        showToast('🎲 Trạng Thái Đơn Hàng', `Đã chuyển sang: ${getFulfillmentMeta(newStatus).fullName}`, 'info');
       });
-    });
+    }
   }
 
   function updateXAIInspector(c) {
@@ -1385,14 +1385,22 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.className = `queue-row ${item.id === currentCaseId ? 'selected' : ''}`;
       tr.innerHTML = `
         <td class="cell-cust">
-          <strong>${item.name}</strong>
+          <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+            <span class="case-chip">Kịch bản #${item.id}</span>
+            <strong>${item.name}</strong>
+          </div>
           <small>Mã KH: #${item.custId}</small>
         </td>
         <td>
           <div style="font-weight: 600; font-size: 12px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             ${item.order.product}
           </div>
-          <small style="color: #64748b;">Mã: ${item.order.code}</small>
+          <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+            <small style="color: #64748b;">Mã: ${item.order.code}</small>
+            <span class="order-status-badge ${getFulfillmentMeta(item.order.fulfillmentStatus || 'dang_giao').badgeClass}" style="font-size: 9.5px; padding: 1px 6px;">
+              ${getFulfillmentMeta(item.order.fulfillmentStatus || 'dang_giao').icon} ${getFulfillmentMeta(item.order.fulfillmentStatus || 'dang_giao').text}
+            </span>
+          </div>
         </td>
         <td style="font-weight: 700; color: var(--shopee-orange); font-family: var(--font-mono);">
           ${item.order.priceFormatted}

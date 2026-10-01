@@ -2575,3 +2575,67 @@ body {
 .modal-footer-note {
   display: none !important;
 }
+
+
+/* Random Fulfillment Status in Sidebar Order Card */
+.order-random-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  margin-top: 6px;
+  border: 1px dashed #cbd5e1;
+}
+
+.random-status-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.random-badge-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.btn-re-random {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.btn-re-random:hover {
+  background: #fff8f6;
+  color: var(--shopee-orange);
+  border-color: var(--shopee-orange);
+}
+
+.case-chip {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+.test-cases-dropdown {
+  display: none !important;
+}
