@@ -679,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message bot';
     msgDiv.innerHTML = `
-      <img class="msg-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" alt="Shopee Bot">
+      <img class="msg-avatar" src="assets/shopee_ai_avatar.jpg" alt="Shopee Bot">
       <div class="msg-bubble">
         <div class="msg-text">${htmlContent}</div>
         <span class="msg-time">${timeStr}</span>
@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardDiv = document.createElement('div');
     cardDiv.className = 'message bot';
     cardDiv.innerHTML = `
-      <img class="msg-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" alt="Shopee Bot">
+      <img class="msg-avatar" src="assets/shopee_ai_avatar.jpg" alt="Shopee Bot">
       <div class="msg-bubble" style="width: 100%;">
         <strong>Chọn đơn hàng cần khiếu nại hoàn tiền:</strong>
         <div class="chat-order-card">
@@ -1018,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
     msgDiv.className = 'message bot';
     msgDiv.id = typingId;
     msgDiv.innerHTML = `
-      <img class="msg-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" alt="Shopee Bot">
+      <img class="msg-avatar" src="assets/shopee_ai_avatar.jpg" alt="Shopee Bot">
       <div class="msg-bubble">
         <div class="typing-dots">
           <span></span><span></span><span></span>

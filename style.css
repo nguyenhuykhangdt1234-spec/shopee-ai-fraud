@@ -2743,3 +2743,21 @@ body {
   justify-content: center;
   gap: 6px;
 }
+
+
+.bot-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 15%;
+  border: 2px solid var(--shopee-orange);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.25);
+}
+
+.message.bot .msg-avatar {
+  border: 1.5px solid var(--shopee-orange);
+  background: #fff;
+  object-position: center 15%;
+}
