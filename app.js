@@ -589,37 +589,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         </div>
-
-        <!-- Trạng thái ngẫu nhiên cho từng khách hàng -->
-        <div class="order-random-status-bar">
-          <div class="random-status-left">
-            <span class="random-badge-label">🎲 Trạng thái ngẫu nhiên:</span>
-            <span class="order-status-badge ${meta.badgeClass}">${meta.icon} ${meta.text}</span>
-          </div>
-          <button type="button" id="btn-re-random-status" class="btn-re-random" title="Bấm để đổi ngẫu nhiên sang trạng thái khác (Chuẩn bị / Đang giao / Đã giao)">
-            🔄 Random khác
-          </button>
-        </div>
       </div>
     `;
-
-    // Gắn sự kiện nút đổi ngẫu nhiên trạng thái
-    const btnReRandom = sidebarOrdersList.querySelector('#btn-re-random-status');
-    if (btnReRandom) {
-      btnReRandom.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const currentStatus = currentCase.order.fulfillmentStatus;
-        const newStatus = getRandomFulfillmentStatus(currentStatus);
-        currentCase.order.fulfillmentStatus = newStatus;
-        currentCase.order.fulfillmentStatusText = getFulfillmentMeta(newStatus).fullName;
-
-        // Cập nhật lại giao diện
-        renderSidebarOrders();
-        renderDashboardQueue();
-        renderDashboardCaseDetail(currentCase);
-        showToast('🎲 Trạng Thái Đơn Hàng', `Đã chuyển sang: ${getFulfillmentMeta(newStatus).fullName}`, 'info');
-      });
-    }
   }
 
   function updateXAIInspector(c) {

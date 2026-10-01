@@ -2639,3 +2639,7 @@ body {
 .test-cases-dropdown {
   display: none !important;
 }
+
+.order-random-status-bar, .btn-re-random { display: none !important; }
+
+.order-random-status-bar, .btn-re-random { display: none !important; }
