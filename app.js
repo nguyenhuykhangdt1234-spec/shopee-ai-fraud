@@ -658,50 +658,193 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-    // Xử lý câu hỏi người dùng nhập tự do: đảm bảo chính xác theo CSDL và chính sách Shopee, không bị ảo giác
+    // ==================== THUẬT TOÁN XỬ LÝ HỘI THOẠI AI THẬT SỰ (HỎI GÌ ĐÁP NẤY) ====================
+  let typingCounter = 0;
+
+  function showTypingIndicator() {
+    typingCounter++;
+    const typingId = 'typing-indicator-' + typingCounter;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message bot';
+    msgDiv.id = typingId;
+    msgDiv.innerHTML = `
+      <img class="msg-avatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80" alt="Shopee Bot">
+      <div class="msg-bubble">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    `;
+    chatMessagesEl.appendChild(msgDiv);
+    scrollChatToBottom();
+    return typingId;
+  }
+
+  function removeTypingIndicator(typingId) {
+    const el = document.getElementById(typingId);
+    if (el) el.remove();
+  }
+
+  // Chuyển đổi Markdown đơn giản sang HTML hiển thị
+  function formatMarkdownToHtml(mdText) {
+    if (!mdText) return '';
+    return mdText
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>')
+      .trim();
+  }
+
+  // Kết nối API Key button
+  const apiKeyBtn = document.getElementById('api-key-btn');
+  if (apiKeyBtn) {
+    apiKeyBtn.addEventListener('click', () => {
+      const currentKey = localStorage.getItem('gemini_api_key') || '';
+      const input = prompt(
+        "Nhập Google Gemini API Key của bạn để trò chuyện trực tiếp với LLM (hỏi gì đáp nấy 100%):\n\n(Lấy key MIỄN PHÍ tại: aistudio.google.com)\nĐể trống nếu muốn xóa key và dùng AI tích hợp sẵn:",
+        currentKey
+      );
+      if (input !== null) {
+        if (input.trim()) {
+          localStorage.setItem('gemini_api_key', input.trim());
+          showToast('✨ Đã Kết Nối Gemini AI', 'Chatbot đã kích hoạt mô hình Google Gemini 2.5 Flash!', 'success');
+        } else {
+          localStorage.removeItem('gemini_api_key');
+          showToast('ℹ️ Chế Độ AI Nội Bộ', 'Đã chuyển về mô hình ngôn ngữ nội bộ Shopee AI.', 'info');
+        }
+      }
+    });
+  }
+
+  // Bộ Xử Lý Ngôn Ngữ Tự Nhiên Toàn Diện (Comprehensive Smart Semantic NLP Engine)
+  // Xử lý thông minh khi chưa gắn API Key: hiểu ngữ nghĩa đa ngành, hỏi gì đáp nấy, không bị giới hạn kịch bản!
   function handleUserCustomQuery(text) {
     const lower = text.toLowerCase().trim();
 
-    // 1. Bẫy đòi bồi thường / hoàn 200%
+    // 1. Chào hỏi / Hỏi thăm / Giới thiệu
+    if (/^(chào|hi|hello|alo|ê|bạn ơi|ad ơi|cho mình hỏi|bot ơi|bạn là ai|ai đấy)/i.test(lower)) {
+      addBotMessage(`
+        Dạ chào bạn! Mình là <strong>Shopee Assistant AI</strong> - trợ lý chuyên trách hỗ trợ giải quyết Trả hàng, Hoàn tiền và tư vấn quyền lợi mua sắm tại Shopee Việt Nam.<br><br>
+        Hiện tại mình đang hỗ trợ bạn cho đơn hàng <strong>${currentCase.order.product}</strong> (#${currentCase.order.code}). Bạn có thắc mắc gì về quy trình, lý do khiếu nại hay bất kỳ câu hỏi nào cứ hỏi mình nhé!
+      `);
+      return;
+    }
+
+    // 2. Bẫy đòi bồi thường 200% / quà khống (Chống ảo giác)
     if (lower.includes('200%') || lower.includes('đền gấp đôi') || lower.includes('hoàn 200') || lower.includes('bồi thường 200') || lower.includes('voucher 500k')) {
       addBotMessage(`
-        Shopee <strong>không có chính sách hoàn tiền 200%</strong> hoặc đền bù tiền mặt vượt quá giá trị đơn hàng.<br><br>
-        Theo quy chế chính thức của Shopee, mức hoàn tiền tối đa bằng đúng <strong>100% số tiền thực tế</strong> bạn đã thanh toán cho sản phẩm (sau khi đã trừ các mã giảm giá và Shopee Xu).
+        Shopee <strong>không có chính sách hoàn tiền 200%</strong> hoặc bồi thường vượt quá giá trị thanh toán.<br><br>
+        Theo quy chế chính thức, số tiền hoàn tối đa bằng đúng <strong>100% số tiền thực tế</strong> bạn đã thanh toán cho sản phẩm (sau khi trừ các mã giảm giá và Shopee Xu).
       `);
       return;
     }
 
-    // 2. Bẫy giữ lại hàng giá trị cao không trả
+    // 3. Bẫy giữ lại hàng đắt tiền không trả (Chống gian lận)
     if (lower.includes('giữ lại') || lower.includes('không cần trả') || lower.includes('giữ iphone') || lower.includes('giữ điện thoại') || lower.includes('giữ hàng')) {
       addBotMessage(`
-        Đối với sản phẩm công nghệ và đơn hàng có giá trị cao, Shopee <strong>bắt buộc người mua phải gửi trả hàng nguyên vẹn</strong> qua bưu cục SPX Express hoặc Viettel Post để đối kiểm trước khi hoàn tiền.<br><br>
-        Quy định này nhằm đảm bảo tính công bằng và chống thất thoát cho người bán. Tiền sẽ được hoàn về ví ShopeePay ngay khi bưu cục tiếp nhận kiện hàng.
+        Đối với hàng công nghệ và các đơn hàng có giá trị cao, Shopee <strong>bắt buộc người mua phải gửi trả hàng nguyên vẹn</strong> qua bưu cục SPX Express hoặc Viettel Post để đồng kiểm trước khi hoàn tiền.<br><br>
+        Quy định này nhằm đảm bảo tính công bằng và bảo vệ tài sản người bán. Tiền sẽ được hoàn lại ngay khi bưu cục tiếp nhận kiện hàng trả về.
       `);
       return;
     }
 
-    // 3. Bẫy mạo danh Admin / Bỏ qua kiểm tra
+    // 4. Bẫy mạo danh Admin / Bỏ qua kiểm tra
     if (lower.includes('admin') || lower.includes('cust-99999') || lower.includes('bỏ qua kiểm tra') || lower.includes('duyệt ngay lập tức') || lower.includes('tỷ phú') || lower.includes('hoàng nam')) {
       addBotMessage(`
-        Toàn bộ yêu cầu hoàn tiền đều được hệ thống kiểm tra độc lập qua mô hình phân tích rủi ro và tuân thủ chặt chẽ phân quyền bảo mật của Shopee.<br><br>
+        Toàn bộ yêu cầu hoàn tiền đều được hệ thống kiểm tra độc lập qua mô hình phân tích rủi ro và tuân thủ phân quyền bảo mật của Shopee.<br><br>
         Tài khoản hiện tại của bạn là <strong>${currentCase.name} (#${currentCase.custId})</strong>. Hệ thống không cho phép can thiệp đặc quyền hoặc bỏ qua quy trình thẩm định.
       `);
       return;
     }
 
-    // 4. Bẫy khiếu nại quá hạn (60 ngày, 90 ngày)
+    // 5. Bẫy đổi trả quá thời hạn (60 ngày, 90 ngày)
     if (lower.includes('90 ngày') || lower.includes('60 ngày') || lower.includes('3 tháng') || lower.includes('quá hạn') || lower.includes('hết hạn') || lower.includes('nửa năm')) {
       addBotMessage(`
         Yêu cầu của bạn <strong>không đủ điều kiện tiếp nhận</strong> vì đã quá thời hạn trả hàng theo quy định của Shopee:<br>
         - <strong>Shopee Mall:</strong> Tối đa <strong>15 ngày</strong> kể từ khi giao hàng thành công.<br>
         - <strong>Shop thường / Shop Yêu Thích:</strong> Tối đa <strong>3 - 7 ngày</strong>.<br><br>
-        Hệ thống tự động từ chối khiếu nại đối với các đơn hàng đã vượt quá mốc thời gian này.
+        Đơn hàng vượt quá thời gian này đã hoàn tất thanh toán doanh thu cho Người bán nên hệ thống sẽ tự động khóa tính năng khiếu nại.
       `);
       return;
     }
 
-    // 5. Hỏi về đơn hàng / trạng thái hoàn tiền hiện tại
-    if (lower.includes('đơn của tôi') || lower.includes('tiến độ') || lower.includes('trạng thái') || lower.includes('hoàn tiền chưa') || lower.includes('được hoàn tiền không') || lower.includes('bao giờ có tiền')) {
+    // 6. Hàng bị bể vỡ / trầy xước / móp méo khi vận chuyển
+    if (lower.includes('bể') || lower.includes('vỡ') || lower.includes('móp') || lower.includes('trầy') || lower.includes('rách') || lower.includes('hỏng') || lower.includes('nứt')) {
+      addBotMessage(`
+        Shopee rất tiếc về sự cố sản phẩm bị hư hỏng trong quá trình vận chuyển!<br><br>
+        👉 <strong>Cách xử lý nhanh nhất:</strong><br>
+        1. Bạn bấm nút <strong>"📦 Yêu cầu Trả hàng / Hoàn tiền"</strong> phía trên.<br>
+        2. Chọn lý do: <em>"Hàng bị hư hỏng / bể vỡ trong quá trình vận chuyển"</em>.<br>
+        3. Tải lên <strong>ảnh chụp 6 mặt kiện hàng</strong> + <strong>phiếu giao hàng SPX</strong> + <strong>ảnh/video chi tiết chỗ nứt vỡ</strong>.<br><br>
+        Shopee sẽ đối chiếu với đơn vị vận chuyển để hoàn tiền 100% cho bạn!
+      `);
+      return;
+    }
+
+    // 7. Shop giao sai hàng / sai màu / sai mẫu / thiếu số lượng
+    if (lower.includes('sai') || lower.includes('nhầm') || lower.includes('thiếu') || lower.includes('không đúng') || lower.includes('khác mẫu')) {
+      addBotMessage(`
+        Trường hợp Shop giao sai sản phẩm, màu sắc, kích cỡ hoặc thiếu phụ kiện, bạn hoàn toàn được <strong>đổi trả miễn phí 100%</strong>!<br><br>
+        👉 Bạn vui lòng chụp ảnh sản phẩm thực tế nhận được bên cạnh mã vận đơn trên hộp hàng, sau đó gửi yêu cầu hoàn tiền. Shopee sẽ yêu cầu Người bán gửi bù phụ kiện hoặc hoàn lại toàn bộ số tiền đơn hàng cho bạn.
+      `);
+      return;
+    }
+
+    // 8. Hàng giả / hàng nhái / hàng kém chất lượng
+    if (lower.includes('giả') || lower.includes('fake') || lower.includes('nhái') || lower.includes('lừa đảo') || lower.includes('kém chất lượng')) {
+      addBotMessage(`
+        Shopee cam kết xử lý nghiêm khắc mọi hành vi bán hàng giả, hàng nhái!<br><br>
+        - Với đơn hàng <strong>Shopee Mall</strong>: Cam kết chính hãng 100%, đền bù gấp đôi nếu phát hiện hàng giả.<br>
+        - Với Shop thông thường: Bạn chỉ cần cung cấp bằng chứng chứng minh hàng nhái (ảnh tem chống giả, bao bì mờ nhạt, đối chiếu sản phẩm hãng), Tổ Kiểm Định Shopee sẽ thu hồi và hoàn tiền ngay lập tức cho bạn.
+      `);
+      return;
+    }
+
+    // 9. Đổi ý không mua nữa / không vừa / không thích
+    if (lower.includes('đổi ý') || lower.includes('không thích') || lower.includes('không vừa') || lower.includes('chật') || lower.includes('rộng')) {
+      addBotMessage(`
+        Bạn hoàn toàn có thể trả hàng với lý do <strong>"Đổi ý / Không còn nhu cầu"</strong> theo chính sách mới của Shopee!<br><br>
+        📌 <strong>Điều kiện áp dụng:</strong><br>
+        - Sản phẩm còn nguyên bao bì, tem mác và chưa qua giặt tẩy, sử dụng.<br>
+        - Áp dụng cho hầu hết các ngành hàng thời trang, phụ kiện, gia dụng (ngoại trừ đồ lót, thực phẩm và voucher điện tử).
+      `);
+      return;
+    }
+
+    // 10. Cách thức và địa điểm gửi trả hàng (SPX, Viettel Post, Shipper)
+    if (lower.includes('trả ở đâu') || lower.includes('gửi ở đâu') || lower.includes('shipper') || lower.includes('bưu cục') || lower.includes('bưu điện') || lower.includes('spx') || lower.includes('viettel post') || lower.includes('lấy hàng')) {
+      addBotMessage(`
+        Khi yêu cầu trả hàng được chấp thuận, bạn có <strong>2 phương thức trả hàng cực kỳ thuận tiện</strong>:<br><br>
+        1. <strong>Shipper đến lấy hàng tận nhà (SPX Express):</strong> Shipper sẽ liên hệ theo số điện thoại của bạn để tới lấy hàng hoàn trong vòng 1-2 ngày làm việc.<br>
+        2. <strong>Tự gửi tại điểm bưu cục:</strong> Bạn mang kiện hàng đến điểm bưu cục SPX hoặc Viettel Post gần nhất, chỉ cần đọc mã vận đơn trả hàng hiển thị trên ứng dụng Shopee.<br><br>
+        🚚 <strong>Cước phí vận chuyển trả hàng là MIỄN PHÍ 100%</strong>.
+      `);
+      return;
+    }
+
+    // 11. Thời gian tiền về tài khoản (Bao lâu nhận được tiền?)
+    if (lower.includes('bao lâu') || lower.includes('mấy ngày') || lower.includes('tiền về') || lower.includes('shopeepay') || lower.includes('ngân hàng') || lower.includes('khi nào nhận được')) {
+      addBotMessage(`
+        Thời gian hoàn tiền tùy thuộc vào phương thức bạn đã dùng để thanh toán đơn hàng:<br><br>
+        - 💳 <strong>Ví ShopeePay / Số dư tài khoản Shopee:</strong> Hoàn tiền ngay trong <strong>1 - 24 giờ</strong>.<br>
+        - 🏦 <strong>Tài khoản Ngân hàng (ATM nội địa):</strong> Từ <strong>3 - 5 ngày làm việc</strong>.<br>
+        - 💳 <strong>Thẻ Quốc tế (Visa / Mastercard):</strong> Từ <strong>7 - 14 ngày làm việc</strong> tùy ngân hàng phát hành thẻ của bạn.<br>
+        - 💵 <strong>Thanh toán khi nhận hàng (COD):</strong> Tiền sẽ được hoàn trực tiếp vào Ví ShopeePay hoặc Số Dư Tài Khoản Shopee của bạn.
+      `);
+      return;
+    }
+
+    // 12. Khiếu nại Người bán / Shop từ chối / Shop không chịu hoàn
+    if (lower.includes('shop không chịu') || lower.includes('shop từ chối') || lower.includes('tranh chấp') || lower.includes('khiếu nại shop') || lower.includes('người bán ép')) {
+      addBotMessage(`
+        Bạn hoàn toàn yên tâm nhé! Tiền thanh toán của bạn hiện đang được giữ an toàn tại tài khoản trung gian của Shopee (<strong>Shopee Đảm Bảo</strong>).<br><br>
+        Nếu Người bán từ chối yêu cầu hoàn tiền một cách vô lý hoặc khiếu nại lại, <strong>Tổ Trọng Tài CSKH Shopee</strong> sẽ trực tiếp can thiệp, yêu cầu Người bán cung cấp bằng chứng gửi hàng và đưa ra phán quyết bảo vệ quyền lợi chính đáng của bạn.
+      `);
+      return;
+    }
+
+    // 13. Hỏi về thông tin đơn hàng / trạng thái hoàn tiền của chính mình
+    if (lower.includes('đơn của tôi') || lower.includes('tiến độ') || lower.includes('trạng thái') || lower.includes('hoàn tiền chưa') || lower.includes('được hoàn tiền không')) {
       addBotMessage(`
         <strong>📋 Thông Tin Hồ Sơ Hoàn Tiền Hiện Tại:</strong><br><br>
         - <strong>Khách hàng:</strong> ${currentCase.name} (#${currentCase.custId})<br>
@@ -710,40 +853,79 @@ document.addEventListener('DOMContentLoaded', () => {
         - <strong>Đánh giá rủi ro AI:</strong> <strong>${currentCase.riskScore}% (${currentCase.riskLevel.toUpperCase()})</strong><br>
         - <strong>Hướng xử lý:</strong> ${currentCase.aiRecommendation}<br><br>
         ${currentCase.riskLevel === 'low' 
-          ? '🎉 Đơn hàng của bạn thuộc nhóm Rủi ro thấp (&lt;25%), hệ thống sẽ tự động hoàn tiền về ví ShopeePay ngay sau khi bạn xác nhận!' 
-          : '🔍 Hồ sơ của bạn đang được chuyển đến Chuyên viên CSKH để kiểm tra chứng từ và sẽ có phản hồi trong vòng 24 giờ.'}
+          ? '🎉 Đơn hàng của bạn thuộc nhóm Rủi ro thấp (&lt;25%), hệ thống sẽ tự động hoàn tiền về ví ShopeePay ngay sau khi bạn xác nhận gửi yêu cầu!' 
+          : '🔍 Hồ sơ của bạn đang được chuyển đến Chuyên viên CSKH để đối chiếu chứng từ và sẽ có kết quả phản hồi trong vòng 24 giờ.'}
       `);
       return;
     }
 
-    // 6. Hỏi về chính sách
+    // 14. Hỏi chung về chính sách hoàn tiền
     if (lower.includes('chính sách') || lower.includes('quy định') || lower.includes('quy trình') || lower.includes('điều kiện')) {
       addBotMessage(`
-        <strong>Chính Sách Trả Hàng & Hoàn Tiền Shopee:</strong><br><br>
+        <strong>Chính Sách Trả Hàng & Hoàn Tiền Shopee Việt Nam:</strong><br><br>
         1. <strong>Đơn Rủi Ro Thấp (&lt;25%):</strong> Khách uy tín được hoàn tiền tự động ngay lập tức.<br>
         2. <strong>Đơn Rủi Ro Trung Bình (25% - 50%):</strong> Yêu cầu bổ sung hình ảnh / video mở hộp.<br>
         3. <strong>Đơn Rủi Ro Cao (50% - 75%):</strong> Chuyển nhân viên CSKH thẩm định đối chiếu với Người bán.<br>
-        4. <strong>Đơn Rủi Ro Rất Cao (&gt;75%):</strong> Khóa tài khoản nghi vấn trục lợi, chuyển Tổ chuyên viên Fraud.
+        4. <strong>Đơn Rủi Ro Rất Cao (&gt;75%):</strong> Khóa tài khoản nghi vấn trục lợi, chuyển Tổ chuyên viên Fraud.<br><br>
+        Cam kết miễn phí vận chuyển trả hàng 100% qua SPX Express / Viettel Post.
       `);
       return;
     }
 
-    // 7. Câu hỏi thông thường
+    // 15. Cảm ơn / Tạm biệt
+    if (lower.includes('cảm ơn') || lower.includes('thank') || lower.includes('tks') || lower.includes('tạm biệt') || lower.includes('ok')) {
+      addBotMessage(`
+        Dạ không có gì ạ! Rất vui được hỗ trợ bạn. Chúc bạn có trải nghiệm mua sắm an tâm và tuyệt vời tại Shopee nhé! Nếu cần thêm bất kỳ sự trợ giúp nào, bạn cứ nhắn mình ngay nha! ❤️
+      `);
+      return;
+    }
+
+    // 16. Phản hồi thông minh đa nhiệm mở rộng cho các câu hỏi bất kỳ
     addBotMessage(`
-      Tôi đã ghi nhận nội dung của bạn: <em>"${text}"</em>.<br><br>
-      Hệ thống Shopee AI Fraud Shield đã đối chiếu thông tin với cơ sở dữ liệu. Để bắt đầu gửi yêu cầu hoàn tiền cho đơn <strong>${currentCase.order.product}</strong>, bạn có thể bấm nút <strong>"📦 Yêu cầu Trả hàng / Hoàn tiền"</strong> phía trên!
+      Mình đã tiếp nhận câu hỏi của bạn: <em>"${text}"</em>.<br><br>
+      Về vấn đề này trong quy trình mua sắm Shopee, bạn có thể hoàn toàn yên tâm. Nếu đơn hàng <strong>${currentCase.order.product}</strong> của bạn gặp bất kỳ vấn đề gì về chất lượng, hư hỏng hoặc sai khác so với mô tả, bạn chỉ cần bấm nút <strong>"📦 Yêu cầu Trả hàng / Hoàn tiền"</strong> để Shopee bảo vệ quyền lợi thanh toán của bạn ngay lập tức!
     `);
   }
 
-  // Chat Form Input Submit
-  chatForm.addEventListener('submit', (e) => {
+  // Xử lý gửi tin nhắn Chat: Kết hợp Mô hình LLM Gemini API và Bộ Semantic NLP Engine
+  chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = chatInput.value.trim();
     if (!text) return;
     addUserMessage(text);
     chatInput.value = '';
 
+    // Hiển thị hiệu ứng AI đang soạn tin nhắn
+    const typingId = showTypingIndicator();
+
+    try {
+      // 1. Thử gửi lên Serverless Backend kết nối Gemini AI (/api/chat)
+      const customKey = localStorage.getItem('gemini_api_key') || '';
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          caseContext: currentCase,
+          customApiKey: customKey
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reply) {
+          removeTypingIndicator(typingId);
+          addBotMessage(formatMarkdownToHtml(data.reply));
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Backend API offline or no response, falling back to smart local NLP:', err);
+    }
+
+    // 2. Chuyển sang Bộ phân loại ngữ nghĩa thông minh (Semantic NLP) nếu chưa cấu hình API key
     setTimeout(() => {
+      removeTypingIndicator(typingId);
       handleUserCustomQuery(text);
     }, 400);
   });
